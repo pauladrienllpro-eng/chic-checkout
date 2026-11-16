@@ -214,8 +214,7 @@ class Payment_Support {
 					'<strong>' . esc_html( $title ) . '</strong>',
 					'<strong>' . esc_html( Plugin_Links::name( $plugin ) ) . '</strong>'
 				);
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans Plugin_Links::render().
-				echo ' ' . Plugin_Links::render( $plugin );
+				echo ' ' . wp_kses_post( Plugin_Links::render( $plugin ) );
 			} else {
 				printf(
 					/* translators: %s: payment gateway name */

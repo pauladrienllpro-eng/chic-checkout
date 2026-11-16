@@ -1,0 +1,146 @@
+Notes de version en français de Chic-checkout, affichées dans l'onglet « Nouveautés »
+(envoyées à Chic Insights par scripts/sync-releases.ts, et lues hors ligne par
+Releases::bundled()). Même format que le changelog de readme.txt, qui est en anglais
+pour WordPress.org. Une ligne « * … » par amélioration, en langage marchand.
+
+== Changelog ==
+
+= 1.11.2 =
+* Nom de l'extension : Chic-checkout.
+* Kit Freemius rangé dans le dossier vendor (exigence des contrôles automatiques de WordPress.org).
+
+= 1.11.1 =
+* Onglet Nouveautés : notes de version de nouveau en français.
+* Lien vers le code source public du bundle React dans le readme.
+
+= 1.11.0 =
+* Nouvelle version gratuite, publiée sur WordPress.org : panier, checkout en 3 étapes et page de confirmation, sans limite de commandes ni de durée. La version Pro reste disponible avec toutes ses fonctions.
+* Licence Pro absente ou expirée : la boutique garde le checkout Chic-checkout avec les fonctions gratuites (au lieu du checkout WooCommerce standard), réglages Pro conservés.
+* Mention « Checkout par Chic-checkout » désactivée par défaut dans la version gratuite. Lien de parrainage retiré.
+* Le plugin utilise désormais la bibliothèque React fournie par WordPress (WordPress 6.6 minimum).
+* Statistiques : la fenêtre d'activation ne s'affiche plus que sur les écrans Chic-checkout.
+
+= 1.10.0 =
+* Nouvelle popin d'avis client sur la page de confirmation : note sur 5 étoiles et commentaire (200 caractères), une seule fois par commande. Délai, contenu et commentaire obligatoire réglables (Page de confirmation → Avis client) ; désactivée par défaut.
+* Écran Performances : nouvelle section Satisfaction client (note moyenne sur 30 jours et depuis le début, répartition des notes, mots qui reviennent dans les commentaires, derniers commentaires).
+* Fiche commande : encadré « Avis client » avec la note et le commentaire laissés par le client.
+
+= 1.9.0 =
+* Nouvel onglet Support : signalez un problème à l'éditeur (criticité, description, captures ou vidéo) et suivez son avancement et les échanges depuis l'admin.
+* Accès support temporaire : sur demande, un compte administrateur dédié et un lien de connexion valable 7 jours, supprimés automatiquement, sans partager de mot de passe.
+* Statistiques : les commandes en paiement express Apple Pay et Google Pay depuis le panier sont de nouveau comptées comme telles.
+* Statistiques : l'étape Livraison du checkout est comptée dès son affichage (abandons à la livraison mesurés correctement).
+
+= 1.8.2 =
+* Compteur du panier (en-tête du thème, mini-panier) : les emballages et les options cadeaux ne sont plus comptés comme des produits.
+
+= 1.8.1 =
+* Points relais Boxtal et La Poste : la carte s'affiche même si le visiteur n'a pas accepté les cookies (choisir un point relais sert à livrer sa commande).
+* Emballages : rappel dans les réglages quand un emballage n'a pas de classe d'expédition alors que la boutique en utilise (sans elle, un mode de livraison peut disparaître du checkout).
+
+= 1.8.0 =
+* Nouveaux moyens de paiement Stripe : Wero, Alma (paiement en 2, 3 ou 4 fois) et Google Pay, au checkout et en paiement express sur le panier pour Google Pay.
+* Logos des moyens de paiement : en petit au bout de chaque ligne, ou à la place du nom (au choix), et un logo à téléverser pour chaque moyen de paiement.
+* Checkout : aucun moyen de paiement n'est plus présélectionné, le client choisit lui-même.
+* Statistiques : Wero, Alma et Google Pay comptés comme moyens de paiement à part entière.
+* Réglages : avertissement quand la case CGV est activée mais qu'aucune page CGV n'est choisie dans WooCommerce (la case ne pouvait pas s'afficher).
+
+= 1.7.0 =
+* Réassurance : logos des moyens de paiement disponibles dans un bloc (case à cocher), blocs classables avec des flèches, et onglet dédié dans Général (panier et checkout).
+* Checkout : la livraison n'est comptée dans le récapitulatif qu'une fois le mode de livraison choisi par le client.
+* Panier : logos de paiement juste sous « Aller au paiement » (avant le paiement express), texte au-dessus des logos facultatif.
+* Klarna : plus de cadres superflus à l'intérieur du moyen de paiement.
+* Récapitulatif de commande (ordinateur) : plus d'espace en trop au-dessus du titre et sous « Total ».
+
+= 1.6.0 =
+* Panier : bannière d'opération spéciale (Noël, soldes…) avec gras, lien et compte à rebours jusqu'à la date de fin, couleur au choix, encadrée dans la page ou en barre pleine largeur (sticky en option), refermable par le client.
+
+= 1.5.5 =
+* Statistiques : étapes Livraison et Paiement du tunnel comptées correctement (l'étape Paiement pouvait dépasser l'étape Livraison).
+* Statistiques partagées : envoi de la journée en cours le matin, à midi et le soir, pour des chiffres plus frais.
+
+= 1.5.4 =
+* Panier : le bouton PayPal du paiement express ne disparaît plus par moments au chargement de la page.
+
+= 1.5.3 =
+* Pastille de compte du panier : petit point vert quand le client est connecté, rapprochée de la bulle de contact.
+
+= 1.5.2 =
+* Adresses hors de France : formulaires de livraison et de facturation adaptés au pays (région, libellés, ordre des champs) ; les commandes vers les États-Unis, le Canada, l'Italie ou l'Espagne ne sont plus refusées faute de région.
+* Option « Connexion obligatoire pour le paiement express » : fenêtre de connexion ou de création de compte avant Apple Pay ou PayPal.
+* Statut du compte dans l'en-tête du panier (« Se connecter » ou « Bonjour Marie »).
+
+= 1.5.1 =
+* Panier : bouton Apple Pay du paiement express en pleine largeur et aux coins arrondis sur iPhone (bouton natif de Safari).
+
+= 1.5.0 =
+* Paiement express Apple Pay et PayPal sur le panier, sous « Aller au paiement » : adresse et livraison choisies dans Apple Pay ou PayPal, puis page de confirmation. Avertissement si le domaine n'est pas enregistré pour Apple Pay.
+* Checkout : Apple Pay masqué sur les appareils qui ne le gèrent pas.
+* Réglages réorganisés dans un menu latéral, conseils de format sous chaque champ image.
+* Message cadeau : photo qui s'agrandit à l'ouverture, saisie dans un panneau en bas d'écran sur mobile. Popin de contact à la même interface.
+* Logo PayPal réduit dans la réassurance paiement du panier.
+* Statistiques : licence vérifiée même quand elle est activée après l'enregistrement du site.
+* Statistiques du paiement express mesurées à part du checkout (parcours de chaque commande, tentatives, échecs) ; finalisation du checkout et abandon au paiement calculés hors paiement express.
+
+= 1.4.0 =
+* Proposer une idée depuis l'onglet Nouveautés, suivre son statut et être prévenu par e-mail quand elle est disponible.
+
+= 1.3.0 =
+* Nouvel onglet « Nouveautés » : chaque version de Chic-checkout, sa date et ce qu'elle apporte, avec un badge quand une nouvelle version sort.
+
+= 1.2.2 =
+* Défilement entre les étapes : chaque étape arrive en haut de l'écran, bouton « Continuer » visible (il fallait remonter après la livraison).
+
+= 1.2.1 =
+* Messages d'erreur de paiement (Stripe, PayPal) en français et modifiables (onglet Textes). Klarna corrigé.
+* Liens d'installation des plugins compatibles (onglets Paiement et Intégrations) ; extension officielle WooCommerce PayPal Payments masquée (non compatible).
+* Page de confirmation : un e-mail long ne déborde plus.
+* Sécurité et fiabilité du paiement : seuil du cadeau offert revérifié à chaque modification du panier, Klarna et 3-D Secure confirmés comme le plugin Stripe, redirection garantie après un paiement réussi, issue « version standard » sur l'écran d'erreur, limite d'envoi des statistiques.
+
+= 1.2.0 =
+* Paliers de volume : avertissement, puis délai de 30 jours pour passer au plan supérieur après 2 mois de dépassement continu (le checkout n'est jamais bloqué par l'extension).
+
+= 1.1.12 =
+* Panier : champ code promo avec bouton « Appliquer » intégré, toujours aligné ; sous-total juste avec un code promo appliqué à l'emballage.
+
+= 1.1.11 =
+* Sécurité : connexion Google/Apple réservée aux comptes clients, création de compte soumise au réglage WooCommerce, limite de tentatives sur l'identification, e-mail demandé pour revoir une commande invité. PHP 8.2 minimum.
+
+= 1.1.10 =
+* Onglet Textes (remplacer n'importe quel texte affiché aux clients), ordre des blocs du panier sur ordinateur et sur mobile, priorité des emballages en panier mixte, liseré autour d'Apple Pay.
+
+= 1.1.9 =
+* Emballage gratuit sélectionné automatiquement quand il est le seul proposé (option) ; « Offert » au lieu de 0,00 € pour un emballage gratuit.
+
+= 1.1.8 =
+* Panier : le choix de l'emballage s'affiche immédiatement, et changer d'emballage ne fait plus qu'une requête au lieu de deux.
+
+= 1.1.7 =
+* Panier : photos des emballages nettes et plus grandes (format 3:2) ; format de photo conseillé indiqué dans les réglages.
+
+= 1.1.6 =
+* Récapitulatif de commande : la livraison n'est plus collée à l'emballage, au cadeau ou au message cadeau.
+
+= 1.1.5 =
+* Panier et checkout en pleine largeur sur ordinateur (1 600 px au plus), avec la même mise en page sur les deux pages.
+
+= 1.1.4 =
+* Emballages conditionnels : un emballage peut n'être proposé que pour certaines catégories, étiquettes ou classes de livraison. SDK Freemius 2.13.5.
+
+= 1.1.3 =
+* Page de confirmation : horaires du point relais qui ne débordent plus de la carte ; adresse du point relais correctement mise en forme (« Place de la Mairie »).
+
+= 1.1.2 =
+* Panier et checkout à la même largeur sur ordinateur ; état des envois de statistiques et bouton « Envoyer maintenant ».
+
+= 1.1.1 =
+* Fenêtre d'activation des statistiques ; statistiques locales et partage séparés.
+
+= 1.1.0 =
+* Statistiques agrégées et pseudonymes (désactivées par défaut, onglet Statistiques) et écran Performances.
+
+= 1.0.1 =
+* Le menu « Contact » ajouté par Freemius est masqué.
+
+= 1.0.0 =
+* Première version commerciale (licence Freemius, plans Starter, Pro et Agence). Détail complet dans CHANGELOG.md.

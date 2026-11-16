@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Plugin Name:       Chic-checkout for WooCommerce
+ * Plugin Name:       Chic-checkout
  * Plugin URI:        https://pauladrien.fr/chic-checkout/
  * Description:       Remplace le panier, le checkout et la page de confirmation WooCommerce par un parcours en 3 étapes (Identification, Livraison, Paiement), basé sur la Store API.
- * Version:           1.11.0
+ * Version:           1.11.2
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Requires Plugins:  woocommerce
@@ -49,7 +49,7 @@ if ( defined( 'CHIC_CHECKOUT_VERSION' ) ) {
     } );
     return;
 }
-define( 'CHIC_CHECKOUT_VERSION', '1.11.0' );
+define( 'CHIC_CHECKOUT_VERSION', '1.11.2' );
 define( 'CHIC_CHECKOUT_FILE', __FILE__ );
 define( 'CHIC_CHECKOUT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CHIC_CHECKOUT_URL', plugin_dir_url( __FILE__ ) );
@@ -68,7 +68,9 @@ if ( !function_exists( 'cc_fs' ) ) {
     function cc_fs() {
         global $cc_fs;
         if ( !isset( $cc_fs ) ) {
-            require_once __DIR__ . '/freemius/start.php';
+            // SDK dans vendor/ (emplacement recommandé par Freemius) : les contrôles automatiques
+            // de WordPress.org le traitent comme une dépendance tierce.
+            require_once __DIR__ . '/vendor/freemius/start.php';
             $cc_fs = fs_dynamic_init( array(
                 'id'               => '42241',
                 'slug'             => 'chic-checkout',
@@ -170,6 +172,16 @@ register_activation_hook( __FILE__, 'chic_checkout_activate' );
 if ( !function_exists( 'chic_checkout_uninstall' ) ) {
     function chic_checkout_uninstall() {
         global $wpdb;
+        // Autre copie de Chic-checkout encore installée (version gratuite et version Pro
+        // côte à côte, ou ancien dossier) : elles partagent les mêmes réglages, rien n'est
+        // supprimé. Seule la suppression de la dernière copie nettoie le site.
+        if ( !function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $copies = array_filter( get_plugins(), static fn( $plugin ) => 'chic-checkout' === ($plugin['TextDomain'] ?? '') );
+        if ( count( $copies ) > 1 ) {
+            return;
+        }
         delete_option( 'chic_checkout_settings' );
         delete_option( 'chic_checkout_db_version' );
         delete_option( 'chic_checkout_license' );

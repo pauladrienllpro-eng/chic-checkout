@@ -47,12 +47,14 @@ class Releases {
     }
 
     /**
-     * Changelog de readme.txt (« = 1.2.2 = » puis « * … ») : jusqu'à la version installée.
+     * Notes embarquées (« = 1.2.2 = » puis « * … ») : changelog-fr.txt (notes en français,
+     * l'interface du plugin est en français), sinon le changelog de readme.txt (en anglais
+     * pour WordPress.org).
      *
      * @return array<int, array{version: string, date: string, notes: string[]}>
      */
     public static function bundled() : array {
-        $readme = CHIC_CHECKOUT_DIR . 'readme.txt';
+        $readme = ( is_readable( CHIC_CHECKOUT_DIR . 'changelog-fr.txt' ) ? CHIC_CHECKOUT_DIR . 'changelog-fr.txt' : CHIC_CHECKOUT_DIR . 'readme.txt' );
         $text = ( is_readable( $readme ) ? (string) file_get_contents( $readme ) : '' );
         $parts = preg_split( '/^== Changelog ==\\s*$/m', $text );
         $lines = explode( "\n", (string) ($parts[1] ?? '') );

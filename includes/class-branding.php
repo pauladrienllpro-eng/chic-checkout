@@ -80,6 +80,13 @@ final class Branding {
         );
     }
 
+    /** Attribut data-chic-checkout du conteneur racine des templates (rien en marque blanche). */
+    public static function print_root_attribute() : void {
+        if ( self::signature_enabled() ) {
+            echo ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"';
+        }
+    }
+
     /** Attribut du conteneur racine des templates. */
     public static function root_attribute() : string {
         return ( self::signature_enabled() ? ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"' : '' );

@@ -58,8 +58,7 @@ wp_body_open();
 ?>
 
 <div id="chic-checkout-root"<?php 
-echo \ChicCheckout\Branding::root_attribute();
-// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans root_attribute().
+\ChicCheckout\Branding::print_root_attribute();
 ?>>
 	<div
 		class="chic-checkout chic-checkout--<?php 
@@ -497,8 +496,7 @@ if ( $chic_needs_login ) {
 														<li><span><?php 
                 echo esc_html( $chic_day['label'] );
                 ?></span><span class="chic-thankyou-pickup__periods"><?php 
-                echo implode( '<span class="screen-reader-text">, </span>', array_map( static fn( $period ) => '<span class="chic-thankyou-pickup__period">' . esc_html( $period ) . '</span>', explode( ' · ', $chic_day['value'] ) ) );
-                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- chaque plage échappée ci-dessus.
+                echo wp_kses_post( implode( '<span class="screen-reader-text">, </span>', array_map( static fn( $period ) => '<span class="chic-thankyou-pickup__period">' . esc_html( $period ) . '</span>', explode( ' · ', $chic_day['value'] ) ) ) );
                 ?></span></li>
 													<?php 
             }

@@ -1,6 +1,6 @@
-# Chic-checkout for WooCommerce (free version)
+# Chic-checkout (free version)
 
-Source code of the free version of [Chic-checkout for WooCommerce](https://wordpress.org/plugins/chic-checkout/), published on WordPress.org: a cart, a 3-step checkout and an order confirmation page for WooCommerce, built on the WooCommerce Store API.
+Source code of the free version of [Chic-checkout](https://wordpress.org/plugins/chic-checkout/), published on WordPress.org: a cart, a 3-step checkout and an order confirmation page for WooCommerce, built on the WooCommerce Store API.
 
 This repository mirrors the plugin as distributed on WordPress.org, plus the source of its React bundle.
 
@@ -9,7 +9,7 @@ This repository mirrors the plugin as distributed on WordPress.org, plus the sou
 - `chic-checkout.php`, `includes/`, `templates/`, `assets/`, `languages/`: the plugin, as installed.
 - `build/`: the compiled React bundle loaded by the plugin.
 - `src/`: the source of that bundle (readable ES modules and CSS), from which `build/` is generated.
-- `freemius/`: the [Freemius WordPress SDK](https://github.com/Freemius/wordpress-sdk), used for the opt-in and the optional Pro upgrade.
+- `vendor/freemius/`: the [Freemius WordPress SDK](https://github.com/Freemius/wordpress-sdk), used for the opt-in and the optional Pro upgrade.
 
 ## Building the bundle
 

@@ -1,10 +1,10 @@
-=== Chic-checkout for WooCommerce ===
-Contributors: pauladrien, freemius
+=== Chic-checkout ===
+Contributors: pauladrien
 Tags: woocommerce, checkout, cart, one page checkout, conversion
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.11.0
+Stable tag: 1.11.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,10 @@ Chic-checkout replaces the WooCommerce cart, checkout and order confirmation pag
 * Compatible with WooCommerce High-Performance Order Storage (HPOS). Requires WooCommerce 6.4 or later.
 
 The plugin interface is in French.
+
+= Source code =
+
+The React bundle in build/ is compiled. Its readable source, and the tools to rebuild it, are in the public repository [github.com/pauladrienllpro-eng/chic-checkout](https://github.com/pauladrienllpro-eng/chic-checkout).
 
 = Pro version =
 
@@ -106,6 +110,14 @@ The plugin connects to an external service only when the matching feature is set
 * **Boxtal** and **La Poste**, on the Shipping step, when their plugins and the matching integration are active: pickup point map, loaded by the carrier's plugin.
 
 == Changelog ==
+
+= 1.11.2 =
+* Plugin name: Chic-checkout.
+* The Freemius SDK is now loaded from the vendor folder.
+
+= 1.11.1 =
+* Release notes in the News tab are shown in French again (the plugin interface is in French).
+* Readme: link to the public source code of the React bundle.
 
 = 1.11.0 =
 * New free version on WordPress.org: cart, 3-step checkout and order confirmation page, with no order or time limit. The Pro version remains available with all its features.

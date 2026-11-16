@@ -2939,7 +2939,7 @@ class Settings {
             esc_html_e( 'Dans Extensions → Ajouter une extension → Téléverser une extension, choisissez ce zip, puis « Installer maintenant ».', 'chic-checkout' );
             ?></li>
 					<li><?php 
-            esc_html_e( 'Activez « Chic-checkout for WooCommerce Pro » : la version gratuite est désactivée automatiquement, vos réglages sont repris tels quels et le checkout reste en ligne.', 'chic-checkout' );
+            esc_html_e( 'Activez « Chic-checkout Pro » : la version gratuite est désactivée automatiquement, vos réglages sont repris tels quels et le checkout reste en ligne.', 'chic-checkout' );
             ?></li>
 					<li><?php 
             esc_html_e( 'Saisissez votre clé de licence si elle vous est demandée (même e-mail), puis supprimez la version gratuite depuis la page Extensions.', 'chic-checkout' );
@@ -3214,8 +3214,7 @@ class Settings {
                 } elseif ( !empty( $definition['slug'] ) ) {
                     ?>
 								<span style="margin-left:8px;"><?php 
-                    echo Plugin_Links::render( $definition['slug'] );
-                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans Plugin_Links::render().
+                    echo wp_kses_post( Plugin_Links::render( $definition['slug'] ) );
                     ?></span>
 							<?php 
                 } else {
@@ -3289,8 +3288,7 @@ class Settings {
             ?></span>
 						</td>
 						<td><?php 
-            echo Plugin_Links::render( $slug );
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans Plugin_Links::render().
+            echo wp_kses_post( Plugin_Links::render( $slug ) );
             ?></td>
 					</tr>
 				<?php 
@@ -3348,8 +3346,7 @@ class Settings {
                             esc_html__( 'Installez %s pour proposer ce moyen de paiement.', 'chic-checkout' ),
                             '<strong>' . esc_html( Plugin_Links::name( $plugin ) ) . '</strong>'
                          );
-                        echo '<br />' . Plugin_Links::render( $plugin );
-                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans Plugin_Links::render().
+                        echo '<br />' . wp_kses_post( Plugin_Links::render( $plugin ) );
                         ?>
 								<?php 
                     }
@@ -3562,9 +3559,7 @@ class Settings {
     private static function render_fields( array $fields ) : void {
         foreach ( $fields as $field ) {
             $args = (array) ($field['args'] ?? array());
-            $class = ( empty( $args['class'] ) ? '' : ' class="' . esc_attr( $args['class'] ) . '"' );
-            echo '<tr' . $class . '><th scope="row">';
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé ci-dessus.
+            echo ( empty( $args['class'] ) ? '<tr><th scope="row">' : '<tr class="' . esc_attr( $args['class'] ) . '"><th scope="row">' );
             if ( !empty( $args['label_for'] ) ) {
                 echo '<label for="' . esc_attr( $args['label_for'] ) . '">' . wp_kses_post( $field['title'] ) . '</label>';
             } else {

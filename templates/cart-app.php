@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<div id="chic-checkout-root"<?php echo \ChicCheckout\Branding::root_attribute(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- échappé dans root_attribute(). ?>>
+<div id="chic-checkout-root"<?php \ChicCheckout\Branding::print_root_attribute(); ?>>
 	<?php // Remplacé par React dès qu'il monte. S'il ne monte jamais (JS bloqué, retardé ou en erreur), le visiteur n'est pas bloqué sur une page blanche. ?>
 	<div class="chic-boot" role="status">
 		<span class="chic-boot__spinner" aria-hidden="true"></span>
