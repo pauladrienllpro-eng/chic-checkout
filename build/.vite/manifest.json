@@ -1,0 +1,19 @@
+{
+  "src/main.tsx": {
+    "file": "assets/main-BwCOtrU7.js",
+    "name": "main",
+    "src": "src/main.tsx",
+    "isEntry": true
+  },
+  "src/main-cart.tsx": {
+    "file": "assets/cart-CtKgpALg.js",
+    "name": "cart",
+    "src": "src/main-cart.tsx",
+    "isEntry": true
+  },
+  "src/thankyou.css": {
+    "file": "assets/thankyou-BkQA7aKb.css",
+    "src": "src/thankyou.css",
+    "isEntry": true
+  }
+}

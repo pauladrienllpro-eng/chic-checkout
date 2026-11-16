@@ -1,0 +1,35 @@
+/*
+ * Entrée CSS dédiée à la page de confirmation (templates/thankyou-app.php, PHP pur,
+ * sans bundle JS). Le checkout et le panier sont buildés en IIFE et injectent leur CSS
+ * via le JS : le manifest n'expose donc aucun fichier .css pour eux. Cette entrée
+ * produit un vrai fichier CSS (clé de manifest src/thankyou.css), enqueue par
+ * Thankyou_Assets : variables --chic-*, police DM Sans de .chic-checkout, .chic-logo...
+ * Les styles propres à la page vivent dans assets/css/thankyou.css.
+ */
+@import './styles/checkout.css';
+
+/* Mention « Checkout par Chic-checkout » (voir Branding / BrandingNote) : discrète, mais
+   contraste ≥ 4.5:1 (#57534e sur blanc : 7.6:1), lien souligné et focus visible. */
+.chic-branding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #57534e;
+}
+.chic-branding a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.chic-branding a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.chic-checkout--high-contrast .chic-branding {
+  color: #000;
+}

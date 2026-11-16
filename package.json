@@ -1,0 +1,17 @@
+{
+  "name": "chic-checkout",
+  "version": "1.11.0",
+  "private": true,
+  "description": "Chic-checkout for WooCommerce (free version): source of the React bundle in build/",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^9.12.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  }
+}

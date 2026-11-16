@@ -1,0 +1,359 @@
+/* ---------- Fenêtre de connexion du panier (LoginSheet.tsx) ----------
+   Reprend l'étape Identification du checkout (LoginStep.tsx). Copie des règles de
+   checkout.css (champs, bouton, identification), limitée à .chic-login-sheet : cart.css
+   reste indépendant de checkout.css. À garder synchro avec checkout.css. */
+#chic-checkout-root .chic-login-sheet .chic-contact-popup__panel {
+  max-width: 440px;
+}
+
+#chic-checkout-root .chic-login-sheet__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 1;
+}
+
+#chic-checkout-root .chic-login-sheet__body {
+  padding: 0.5rem 1.5rem 1.5rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 0 0;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step h2 {
+  margin: 0;
+  padding-right: 2.5rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: var(--chic-text);
+}
+
+/* Bouton pleine largeur dans la popin, même sur ordinateur (fenêtre étroite). */
+#chic-checkout-root .chic-login-sheet .chic-step button[type='submit'] {
+  align-self: stretch;
+  width: 100%;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--chic-text-muted);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step fieldset legend {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--chic-text-muted);
+  padding: 0;
+  margin-bottom: 0.25rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step fieldset label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  text-transform: none;
+  font-size: 0.95rem;
+  color: var(--chic-text);
+  cursor: pointer;
+  letter-spacing: normal;
+}
+
+/*
+ * `!important` sur les propriétés visuelles ci-dessous (border/background/padding/
+ * font/color/border-radius/box-shadow) : certains thèmes WooCommerce (ex. Manon)
+ * appliquent leurs propres `!important` sur `select`/`textarea` en ciblant la classe
+ * `.woocommerce-checkout` que WordPress ajoute au <body> dès que `is_checkout()` est
+ * vrai — même si c'est NOTRE template qui s'affiche. Une spécificité plus élevée seule
+ * (ex. préfixe #chic-checkout-root) ne suffit pas à battre un `!important` : il faut
+ * matcher avec notre propre `!important` sur les mêmes propriétés.
+ */
+#chic-checkout-root .chic-login-sheet .chic-step input:not([type='radio']):not([type='checkbox']),
+#chic-checkout-root .chic-login-sheet .chic-step select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--chic-border-strong) !important;
+  border-radius: var(--chic-radius) !important;
+  background: var(--chic-surface) !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--chic-text) !important;
+  box-shadow: none !important;
+  transition: border-color var(--chic-duration) var(--chic-ease), box-shadow var(--chic-duration) var(--chic-ease);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step select {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357534E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 2.5rem !important;
+  cursor: pointer;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step input:not([type='radio']):not([type='checkbox']):focus,
+#chic-checkout-root .chic-login-sheet .chic-step select:focus {
+  border-color: var(--chic-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chic-accent) 18%, transparent) !important;
+}
+
+/* Ce champ a déjà son propre focus (bordure + halo ci-dessus) : le contour générique
+   par-dessus ferait un double effet. Les autres éléments (boutons, liens, radios) le
+   gardent, c'est leur seul indicateur de focus clavier. */
+#chic-checkout-root .chic-login-sheet .chic-step input:not([type='radio']):not([type='checkbox']):focus-visible,
+#chic-checkout-root .chic-login-sheet .chic-step select:focus-visible {
+  outline: none;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step input[aria-invalid='true'],
+#chic-checkout-root .chic-login-sheet .chic-step select[aria-invalid='true'] {
+  border-color: #b91c1c !important;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-field-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #b91c1c;
+}
+
+
+#chic-checkout-root .chic-login-sheet .chic-step button[type='submit'] {
+  align-self: flex-start;
+  width: 100%;
+  min-height: 48px;
+  background: var(--chic-cta);
+  color: #fff;
+  border: none;
+  padding: 0 2rem;
+  border-radius: var(--chic-radius-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter var(--chic-duration) var(--chic-ease), transform var(--chic-duration) var(--chic-ease);
+}
+
+
+#chic-checkout-root .chic-login-sheet .chic-step button[type='submit']:hover {
+  filter: brightness(1.15);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step button[type='submit']:active {
+  transform: scale(0.98);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-step button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-intro h2 {
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--chic-text);
+  /* Sans ce reset explicite, ce h2 hérite du text-transform: uppercase que le CSS du
+     thème actif applique à tous les <h2> de la page (wp_head() du thème reste chargé
+     même dans ce document "autonome" — seul le rendu header/footer classique est
+     désactivé, pas ses styles enqueue) — même bug déjà rencontré et corrigé sur le h1
+     de la page de confirmation (voir chic-thankyou-hero h1 dans thankyou.css). */
+  text-transform: none;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-intro p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--chic-text-muted);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-form button[type='submit'] {
+  width: 100%;
+}
+
+
+
+
+
+#chic-checkout-root .chic-login-sheet .chic-social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  width: 100%;
+  background: var(--chic-surface);
+  border: 1px solid var(--chic-border-strong);
+  border-radius: var(--chic-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--chic-text);
+  cursor: pointer;
+  transition: border-color var(--chic-duration) var(--chic-ease);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-social-button:hover {
+  border-color: var(--chic-text-muted);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-social-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Réserve la même hauteur que le bouton Apple à côté avant que le SDK Google n'ait fini
+   de rendre son propre bouton dedans (léger écart de style inévitable — voir
+   google-identity.ts — mais pas de saut de mise en page pendant le chargement). */
+
+#chic-checkout-root .chic-login-sheet .chic-login-email-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--chic-border-strong);
+  border-radius: var(--chic-radius);
+  font-size: 0.95rem;
+  color: var(--chic-text);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-email-chip button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--chic-text-muted);
+  cursor: pointer;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-email-chip button:hover {
+  color: var(--chic-text);
+}
+
+/* Hauteur fixe (pas juste celle, implicite, du champ) : sans ça ce conteneur flex se
+   calculait à 83px de haut au lieu des 48px du champ qu'il contient (constaté en
+   direct), ce qui décalait l'œil afficher/masquer vers le bas et gonflait l'espace
+   avant le champ suivant. 48px = min-height de `.chic-step input` ci-dessous. */
+#chic-checkout-root .chic-login-sheet .chic-password-field {
+  position: relative;
+  display: flex;
+  height: 48px;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-password-field input {
+  flex: 1;
+  padding-right: 2.75rem !important;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--chic-text-muted);
+  cursor: pointer;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-password-toggle:hover {
+  color: var(--chic-text);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-forgot-password {
+  align-self: flex-start;
+  font-size: 0.8rem;
+  color: var(--chic-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-forgot-password:hover {
+  color: var(--chic-text);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#chic-checkout-root .chic-login-sheet .chic-login-choice__text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--chic-text-muted);
+}
+
+#chic-checkout-root .chic-login-sheet .chic-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: chic-spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes chic-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #chic-checkout-root .chic-login-sheet .chic-spinner {
+    animation: none;
+  }
+}
+
