@@ -67,6 +67,8 @@ final class Stats_Contract {
 			'cart_viewed'                     => array(),
 			'checkout_started'                => array(),
 			'step_reached'                    => array( 'extra' => array( 'step' ) ),
+			// Part « paniers sans livraison » des compteurs du tunnel (parcours digital, sans étape Livraison).
+			'digital_funnel'                  => array( 'extra' => array( 'stage' ) ),
 			'order_placed'                    => array(),
 			'order_paid'                      => array(),
 			'order_paid_by'                   => array( 'extra' => array( 'method', 'shipping', 'customer', 'ship_country', 'hour', 'weekday', 'upsell', 'gift', 'coupon', 'free_product', 'flow' ) ),
@@ -130,6 +132,8 @@ final class Stats_Contract {
 			'place'        => array( 'confirmation', 'checkout' ),
 			// Parcours de la commande : checkout, ou paiement express depuis le panier.
 			'flow'         => array( 'checkout', 'express_apple_pay', 'express_google_pay', 'express_paypal' ),
+			// Parcours digital : panier, checkout, étapes, commande payée via le checkout.
+			'stage'        => array( 'cart', 'checkout', 'identification', 'payment', 'paid' ),
 		);
 	}
 

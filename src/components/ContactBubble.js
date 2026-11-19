@@ -112,8 +112,6 @@ function ContactBubble({ style, label, channels, iconUrl, popupTitle, popupText 
   let content = /* @__PURE__ */ jsx(ChatIcon, {});
   if (style === "text") {
     content = label;
-  } else if (iconUrl) {
-    content = /* @__PURE__ */ jsx("img", { className: "chic-contact__icon", src: iconUrl, alt: "" });
   }
   if (channels.length === 1) {
     const channel = channels[0];

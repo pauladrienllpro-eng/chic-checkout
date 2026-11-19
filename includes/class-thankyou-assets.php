@@ -48,6 +48,8 @@ class Thankyou_Assets {
 			$deps[] = 'chic-checkout-thankyou-app';
 		}
 
+		Assets::enqueue_shell_styles( false );
+
 		wp_enqueue_style(
 			'chic-checkout-thankyou',
 			CHIC_CHECKOUT_URL . 'assets/css/thankyou.css',

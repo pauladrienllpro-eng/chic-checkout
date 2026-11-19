@@ -16,7 +16,7 @@ import { useAutoScrollFocusedField } from "./hooks/useAutoScrollFocusedField.js"
 import { useScrollIntoViewOnChange } from "./hooks/useScrollIntoViewOnChange.js";
 import { __ } from "./lib/i18n.js";
 import { trackBeginCheckout, trackAddShippingInfo } from "./lib/ga4.js";
-import { useConfig, computeColors } from "./lib/config.js";
+import { useConfig, styleMode, computeColors } from "./lib/config.js";
 import { safeGetItem, safeSetItem } from "./lib/storage.js";
 import { initStats, stepCompleted, stepEntered, countBrowser } from "./lib/stats.js";
 const HIGH_CONTRAST_STORAGE_KEY = "chic-checkout-high-contrast";
@@ -32,7 +32,7 @@ const HIGH_CONTRAST_VARS = {
 };
 function App() {
   const config = useConfig();
-  const colors = computeColors(config);
+  const colors = computeColors();
   const { cart, refresh } = useCart();
   const needsShipping = cart?.needs_shipping ?? true;
   const stepNamesForFlow = needsShipping ? config.stepNames : [config.stepNames[0], config.stepNames[2]];
@@ -127,7 +127,7 @@ function App() {
   return /* @__PURE__ */ jsx(
     "div",
     {
-      className: `chic-checkout chic-checkout--${config.styleMode} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
+      className: `chic-checkout chic-checkout--${styleMode()} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
       style: {
         "--chic-accent": colors.accent,
         "--chic-bg": colors.bg,
@@ -145,7 +145,7 @@ function App() {
             homeUrl: config.homeUrl,
             contactStyle: config.contactStyle,
             contactLabel: config.contactLabel,
-            contactIconUrl: config.contactIconUrl,
+            contactIconUrl: "",
             contactPopupTitle: config.contactPopupTitle,
             contactPopupText: config.contactPopupText,
             contactChannels: config.contactChannels
@@ -160,10 +160,10 @@ function App() {
               label: config.orderSummaryLabel,
               freeShippingLabel: config.freeShippingLabel,
               pricesIncludeTax: config.pricesIncludeTax,
-              packagingProductIds: config.cartPackagingProductIds,
-              giftProductIds: config.cartGiftCarouselProductIds,
-              loyaltyEnabled: config.checkoutLoyalty.enabled,
-              loyaltyText: config.checkoutLoyalty.text,
+              packagingProductIds: [],
+              giftProductIds: [],
+              loyaltyEnabled: false,
+              loyaltyText: "",
               shippingRateChosen
             }
           )
@@ -175,9 +175,9 @@ function App() {
               {
                 introTitle: config.loginIntroTitle,
                 introText: config.loginIntroText,
-                socialLogins: config.socialLogins,
-                socialGoogleClientId: config.socialGoogleClientId,
-                socialAppleServicesId: config.socialAppleServicesId,
+                socialLogins: [],
+                socialGoogleClientId: "",
+                socialAppleServicesId: "",
                 guestCheckoutEnabled: config.guestCheckoutEnabled,
                 registrationEnabled: config.registrationEnabled,
                 ctaLabels: config.ctaLabels,
@@ -231,7 +231,7 @@ function App() {
                 googlePlacesApiKey: config.googlePlacesApiKey,
                 shippingCountries: config.shippingCountries,
                 freeShippingLabel: config.freeShippingLabel,
-                infoBanner: config.shippingInfoBanner,
+                infoBanner: { text: "", linkUrl: "" },
                 ctaLabels: config.ctaLabels,
                 onRefreshCart: refresh,
                 onSelectRate: () => setShippingRateChosen(true),
@@ -274,10 +274,10 @@ function App() {
                 label: config.orderSummaryLabel,
                 freeShippingLabel: config.freeShippingLabel,
                 pricesIncludeTax: config.pricesIncludeTax,
-                packagingProductIds: config.cartPackagingProductIds,
-                giftProductIds: config.cartGiftCarouselProductIds,
-                loyaltyEnabled: config.checkoutLoyalty.enabled,
-                loyaltyText: config.checkoutLoyalty.text,
+                packagingProductIds: [],
+                giftProductIds: [],
+                loyaltyEnabled: false,
+                loyaltyText: "",
                 shippingRateChosen,
                 variant: "sidebar"
               }

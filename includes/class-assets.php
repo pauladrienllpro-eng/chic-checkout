@@ -56,12 +56,6 @@ class Assets {
         foreach ( self::DEFAULT_SCRIPT_HANDLES as $handle ) {
             wp_dequeue_script( $handle );
         }
-        // En mode 'theme', on garde 'global-styles' : c'est la feuille où WordPress imprime
-        // les variables CSS de theme.json (--wp--preset--color--..., --wp--preset--font-family--...)
-        // dont notre propre CSS a besoin pour hériter des couleurs/polices du thème actif.
-        if ( 'custom' === Settings::get()['style_mode'] ) {
-            wp_dequeue_style( 'global-styles' );
-        }
     }
 
     public function enqueue() : void {
@@ -92,6 +86,7 @@ class Assets {
         // générer ce format pour un script enregistré ainsi, pas de outillage propre à
         // construire ici.
         wp_set_script_translations( self::HANDLE, 'chic-checkout', CHIC_CHECKOUT_DIR . 'languages' );
+        self::enqueue_shell_styles( true );
         $this->localize_config();
         $this->maybe_enqueue_boxtal_connect();
         $this->maybe_enqueue_laposte();
@@ -251,12 +246,29 @@ class Assets {
      * hook 'wp_enqueue_scripts', qui se déclenche lui-même à la priorité 1 de 'wp_head' —
      * y ajouter un callback à la volée à cette même priorité ne s'exécute pas de manière fiable).
      */
+    /**
+     * Feuilles communes aux pages Chic-checkout : écran d'attente avant le montage de
+     * React (panier, checkout) et police DM Sans du design maison (version Pro).
+     */
+    public static function enqueue_shell_styles( bool $with_boot ) : void {
+        if ( $with_boot ) {
+            wp_enqueue_style(
+                'chic-checkout-boot',
+                CHIC_CHECKOUT_URL . 'assets/css/boot.css',
+                array(),
+                self::asset_version( 'assets/css/boot.css' )
+            );
+        }
+    }
+
     public function maybe_print_dev_preamble() : void {
         if ( !$this->is_dev_server_running() || !is_checkout() || is_wc_endpoint_url() ) {
             return;
         }
         $dev_server = 'http://localhost:5173';
-        printf( '<script type="module">import RefreshRuntime from "%1$s/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>(type)=>type;window.__vite_plugin_react_preamble_installed__=true;</script>', esc_url( $dev_server ) );
+        wp_print_inline_script_tag( sprintf( 'import RefreshRuntime from "%1$s/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>(type)=>type;window.__vite_plugin_react_preamble_installed__=true;', esc_url_raw( $dev_server ) ), array(
+            'type' => 'module',
+        ) );
     }
 
     /**
@@ -270,7 +282,7 @@ class Assets {
     private function enqueue_dev_assets() : void {
         $dev_server = 'http://localhost:5173';
         wp_enqueue_script(
-            'vite-client',
+            'chic-checkout-vite-client',
             $dev_server . '/@vite/client',
             array(),
             null,
@@ -279,7 +291,7 @@ class Assets {
         wp_enqueue_script(
             self::HANDLE,
             $dev_server . '/src/main.tsx',
-            array('vite-client', 'wp-i18n'),
+            array('chic-checkout-vite-client', 'wp-i18n'),
             null,
             true
         );
@@ -355,7 +367,7 @@ class Assets {
      * jusqu'à PHP_INT_MAX, sans effet).
      */
     public function add_module_type( string $tag, string $handle ) : string {
-        if ( 'vite-client' !== $handle && self::HANDLE !== $handle ) {
+        if ( 'chic-checkout-vite-client' !== $handle && self::HANDLE !== $handle ) {
             return $tag;
         }
         return self::module_script_tag( $tag );
@@ -395,7 +407,7 @@ class Assets {
         $settings = Settings::get();
         $back_url = ( 'custom' === $settings['back_target'] && $settings['back_custom_url'] ? $settings['back_custom_url'] : wc_get_cart_url() );
         list( $logo_url, $logo_text ) = self::resolve_logo( $settings );
-        wp_add_inline_script( self::HANDLE, 'window.chicCheckout = ' . wp_json_encode( array(
+        $config = array(
             'storeApiUrl'                 => esc_url_raw( rest_url( 'wc/store/v1/' ) ),
             'restNonce'                   => wp_create_nonce( 'wp_rest' ),
             'storeApiNonce'               => wp_create_nonce( 'wc_store_api' ),
@@ -414,10 +426,6 @@ class Assets {
             'addressLocales'              => self::resolve_address_locales( array_keys( WC()->countries->get_shipping_countries() ) ),
             'storeCountry'                => WC()->countries->get_base_country(),
             'freeShippingLabel'           => Polylang_Strings::translate( $settings['free_shipping_label'] ),
-            'shippingInfoBanner'          => array(
-                'text'    => Polylang_Strings::translate( $settings['shipping_info_banner_text'] ),
-                'linkUrl' => $settings['shipping_info_banner_link_url'],
-            ),
             'pricesIncludeTax'            => 'incl' === get_option( 'woocommerce_tax_display_cart' ),
             'ctaLabels'                   => array(
                 'loginEmail'      => Polylang_Strings::translate( $settings['cta_login_email_label'] ),
@@ -430,31 +438,20 @@ class Assets {
                 'payment'         => Polylang_Strings::translate( $settings['cta_payment_label'] ),
             ),
             'termsCheckbox'               => $this->resolve_terms_checkbox( $settings ),
-            'paymentLogoMode'             => $settings['payment_logo_mode'],
             'loginIntroTitle'             => ( Polylang_Strings::translate( $settings['login_intro_title'] ) ?: __( 'Identification', 'chic-checkout' ) ),
             'loginIntroText'              => ( Polylang_Strings::translate( $settings['login_intro_text'] ) ?: __( 'Connectez-vous pour continuer votre commande.', 'chic-checkout' ) ),
-            'socialLogins'                => self::social_logins( $settings ),
-            'socialGoogleClientId'        => ( Edition::is_pro() ? $settings['social_google_client_id'] : '' ),
-            'socialAppleServicesId'       => ( Edition::is_pro() ? $settings['social_apple_services_id'] : '' ),
             'isLoggedIn'                  => is_user_logged_in(),
             'userEmail'                   => ( is_user_logged_in() ? wp_get_current_user()->user_email : '' ),
             'guestCheckoutEnabled'        => 'yes' === get_option( 'woocommerce_enable_guest_checkout' ),
             'registrationEnabled'         => Auth_Api::registration_enabled(),
-            'styleMode'                   => $settings['style_mode'],
-            'bgColor'                     => $settings['bg_color'],
-            'accentColor'                 => $settings['accent_color'],
-            'ctaColor'                    => $settings['cta_color'],
             'contactStyle'                => $settings['contact_style'],
             'contactLabel'                => Polylang_Strings::translate( $settings['contact_label'] ),
-            'contactIconUrl'              => ( $settings['contact_icon_id'] ? wp_get_attachment_image_url( $settings['contact_icon_id'], 'thumbnail' ) : '' ),
             'contactPopupTitle'           => Polylang_Strings::translate( $settings['contact_popup_title'] ),
             'contactPopupText'            => Polylang_Strings::translate( $settings['contact_popup_text'] ),
             'contactChannels'             => $this->resolve_contact_channels( $settings ),
             'stripePublishableKey'        => $this->resolve_stripe_publishable_key(),
             'initialCart'                 => $this->resolve_initial_cart(),
-            'fieldPatterns'               => $settings['field_patterns'],
             'footerLinks'                 => $this->resolve_footer_links( $settings ),
-            'textOverrides'               => self::text_overrides(),
             'footerContrastToggleEnabled' => $settings['footer_contrast_toggle_enabled'],
             'footerContrastToggleLabel'   => Polylang_Strings::translate( $settings['footer_contrast_toggle_label'] ),
             'reassuranceItems'            => $this->resolve_reassurance_items( $settings ),
@@ -463,15 +460,10 @@ class Assets {
             'integrations'                => Integrations::enabled_map(),
             'trackingDebugMode'           => $settings['tracking_debug_mode'],
             'hasConsentApi'               => function_exists( 'wp_has_consent' ),
-            'cartPackagingProductIds'     => ( Edition::is_pro() ? $settings['cart_packaging_product_ids'] : array() ),
-            'cartGiftCarouselProductIds'  => ( Edition::is_pro() ? $settings['cart_gift_carousel_product_ids'] : array() ),
-            'checkoutLoyalty'             => array(
-                'enabled' => $settings['checkout_loyalty_enabled'] && Integrations::is_enabled( 'mycred' ),
-                'text'    => Polylang_Strings::translate( $settings['cart_loyalty_text'] ),
-            ),
             'stats'                       => Stats_Settings::front_config(),
             'branding'                    => Branding::front_config(),
-        ) ) . ';', 'before' );
+        );
+        wp_add_inline_script( self::HANDLE, 'window.chicCheckout = ' . wp_json_encode( $config ) . ';', 'before' );
     }
 
     /**
@@ -563,23 +555,6 @@ class Assets {
             return array((string) wp_get_attachment_image_url( $site_logo_id, 'medium' ), '');
         }
         return array('', get_bloginfo( 'name' ));
-    }
-
-    /**
-     * Liste des providers de social login activés. D'autres clés (line, kakao...)
-     * pourront s'ajouter ici sans changement côté frontend au-delà d'un nouveau bouton.
-     *
-     * @return string[]
-     */
-    public static function social_logins( array $settings ) : array {
-        return array();
-    }
-
-    /**
-     * Textes personnalisés (onglet Textes, version Pro), appliqués par __() côté React.
-     */
-    public static function text_overrides() : object {
-        return (object) array();
     }
 
     /**
@@ -687,16 +662,14 @@ class Assets {
                 continue;
             }
             $is_preset = 'preset' === $row['icon_type'] && $row['icon_preset'];
-            // Image personnalisée : fonction Pro (icône prédéfinie seulement sinon).
-            $custom = !$is_preset && $row['icon_id'] && Edition::is_pro();
-            $items[] = array(
-                'iconUrl'      => ( $custom ? (string) wp_get_attachment_image_url( $row['icon_id'], 'thumbnail' ) : '' ),
+            $item = array(
                 'iconPreset'   => ( $is_preset ? $row['icon_preset'] : '' ),
                 'title'        => Polylang_Strings::translate( $row['title'] ),
                 'text'         => Polylang_Strings::translate( $row['text'] ),
                 'linkUrl'      => $row['link_url'],
                 'paymentIcons' => ( !empty( $row['show_payment_icons'] ) ? $payment_icons ??= Cart_Assets::resolve_payment_icons( true ) : array() ),
             );
+            $items[] = $item;
         }
         return $items;
     }

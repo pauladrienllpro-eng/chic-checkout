@@ -116,25 +116,6 @@ final class Stats_Onboarding {
 				</form>
 			</div>
 		</div>
-		<style>
-			.chic-onboarding{position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}
-			.chic-onboarding__dialog{background:#fff;border-radius:8px;max-width:520px;width:100%;padding:24px 28px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-			.chic-onboarding__dialog h2{margin:0 0 8px;font-size:18px}
-			.chic-onboarding__dialog p{font-size:14px;color:#3c434a;margin:0 0 16px}
-			.chic-onboarding__share{display:flex;gap:10px;align-items:flex-start;background:#f6f7f7;border-radius:6px;padding:12px;font-size:13px;line-height:1.5;color:#1d2327}
-			.chic-onboarding__share input{margin-top:3px}
-			.chic-onboarding__share em{display:block;color:#50575e;font-style:normal;margin-top:4px}
-			.chic-onboarding__actions{display:flex;gap:16px;align-items:center;margin-top:20px}
-		</style>
-		<script>
-			(function () {
-				var modal = document.getElementById('chic-onboarding');
-				if (!modal) { return; }
-				modal.querySelector('.button-primary').focus();
-				// Échap : ferme pour cette page seulement (la proposition reviendra).
-				document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { modal.remove(); } });
-			})();
-		</script>
 		<?php
 	}
 }

@@ -320,44 +320,4 @@ class Thankyou_Override {
         return '';
     }
 
-    /**
-     * Emballage/cadeau choisis sur le panier restent de simples lignes panier (voir
-     * Cart_Assets/PackagingSelector/GiftCarousel) — identifiés ici par ID produit,
-     * exactement comme OrderSummary.tsx le fait côté checkout, pour les afficher à part
-     * plutôt que noyés dans le récapitulatif de commande générique.
-     */
-    /** Emballage cadeau de la commande (version Pro), affiché à part dans le récapitulatif. */
-    public function get_packaging_item( \WC_Order $order ) : ?\WC_Order_Item_Product {
-        return ( Edition::is_pro() ? $this->find_item_by_product_ids( $order, Settings::get()['cart_packaging_product_ids'] ) : null );
-    }
-
-    /** Produit offert de la commande (version Pro), affiché à part dans le récapitulatif. */
-    public function get_gift_item( \WC_Order $order ) : ?\WC_Order_Item_Product {
-        return ( Edition::is_pro() ? $this->find_item_by_product_ids( $order, Settings::get()['cart_gift_carousel_product_ids'] ) : null );
-    }
-
-    /**
-     * @param int[] $product_ids
-     */
-    private function find_item_by_product_ids( \WC_Order $order, array $product_ids ) : ?\WC_Order_Item_Product {
-        if ( !$product_ids ) {
-            return null;
-        }
-        foreach ( $order->get_items() as $item ) {
-            if ( $item instanceof \WC_Order_Item_Product && in_array( $item->get_product_id(), $product_ids, true ) ) {
-                return $item;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Message cadeau (version Pro). null = option jamais activée par le client (carte
-     * « Message cadeau » absente) ; chaîne vide = activée mais laissée vierge (« message
-     * vide autorisé ») ; sinon le texte tapé.
-     */
-    public function get_gift_message( \WC_Order $order ) : ?string {
-        return null;
-    }
-
 }

@@ -33,13 +33,17 @@ function useConfig() {
   }
   return config;
 }
+function styleMode(config) {
+  return "theme";
+}
 function computeColors(config) {
-  const isTheme = config.styleMode === "theme";
-  return {
-    accent: isTheme ? `var(--wp--preset--color--primary, ${config.accentColor || "#1c1917"})` : config.accentColor || "#1c1917",
-    bg: isTheme ? `var(--wp--preset--color--base, ${config.bgColor || "#ffffff"})` : config.bgColor || "#ffffff",
-    cta: config.ctaColor || "#44403c"
-  };
+  {
+    return {
+      accent: "var(--wp--preset--color--primary, #1c1917)",
+      bg: "var(--wp--preset--color--base, #ffffff)",
+      cta: "#44403c"
+    };
+  }
 }
 export {
   ConfigProvider,
@@ -47,5 +51,6 @@ export {
   computeColors,
   getConfig,
   requireConfig,
+  styleMode,
   useConfig
 };

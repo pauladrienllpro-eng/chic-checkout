@@ -6,7 +6,7 @@ import { LoginSheet } from "./components/cart/LoginSheet.js";
 import { Footer } from "./components/Footer.js";
 import { ReassuranceList } from "./components/ReassuranceList.js";
 import { CartItemsList } from "./components/cart/CartItemsList.js";
-import { useConfig, computeColors } from "./lib/config.js";
+import { useConfig, styleMode, computeColors } from "./lib/config.js";
 import "./lib/optimistic-cart.js";
 import { initStats, countBrowser } from "./lib/stats.js";
 import "react-dom";
@@ -35,7 +35,7 @@ const HIGH_CONTRAST_VARS = {
 };
 function CartApp() {
   const config = useConfig();
-  const colors = computeColors(config);
+  const colors = computeColors();
   const { cart, setCart, refresh } = useCart();
   const [highContrast, setHighContrast] = useState(
     () => safeGetItem(HIGH_CONTRAST_STORAGE_KEY) === "1"
@@ -112,7 +112,7 @@ function CartApp() {
   return /* @__PURE__ */ jsxs(
     "div",
     {
-      className: `chic-checkout chic-checkout--${config.styleMode} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
+      className: `chic-checkout chic-checkout--${styleMode()} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
       style: {
         "--chic-accent": colors.accent,
         "--chic-bg": colors.bg,
@@ -130,7 +130,7 @@ function CartApp() {
             homeUrl: config.homeUrl,
             contactStyle: config.contactStyle,
             contactLabel: config.contactLabel,
-            contactIconUrl: config.contactIconUrl,
+            contactIconUrl: "",
             contactPopupTitle: config.contactPopupTitle,
             contactPopupText: config.contactPopupText,
             contactChannels: config.contactChannels,
@@ -144,7 +144,7 @@ function CartApp() {
         isEmpty && /* @__PURE__ */ jsx(EmptyCart, { shopUrl: config.backUrl, text: config.emptyCartText }),
         cart && !isEmpty && /* @__PURE__ */ jsx("div", { className: "chic-cart-shell", children: /* @__PURE__ */ jsxs("div", { className: "chic-cart-layout", children: [
           /* @__PURE__ */ jsxs("div", { className: "chic-cart-layout__main", children: [
-            /* @__PURE__ */ jsx(CartItemsList, { items: regularItems, cart, imageSize: config.cartImageSize, onChange: setCart }),
+            /* @__PURE__ */ jsx(CartItemsList, { items: regularItems, cart, imageSize: "lg", onChange: setCart }),
             mainBlocks.map(renderBlock)
           ] }),
           /* @__PURE__ */ jsxs("div", { className: "chic-cart-layout__side", children: [

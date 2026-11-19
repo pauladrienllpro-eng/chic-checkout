@@ -1,0 +1,46 @@
+/* Administration Chic-checkout (écran de réglages, Performances). */
+
+/* Écran de réglages */
+.chic-settings__layout { display: flex; gap: 24px; align-items: flex-start; margin-top: 16px; }
+.chic-settings__nav { flex: 0 0 210px; position: sticky; top: 46px; }
+.chic-settings__group { margin: 18px 0 6px; padding: 0 12px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #646970; }
+.chic-settings__group:first-child { margin-top: 0; }
+.chic-settings__nav ul { margin: 0; }
+.chic-settings__nav li { margin: 0; }
+.chic-settings__nav a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-left: 3px solid transparent; border-radius: 0 4px 4px 0; color: #1d2327; text-decoration: none; transition: background-color .15s; }
+.chic-settings__nav a:hover { background: #fff; color: #2271b1; }
+.chic-settings__nav a:focus { box-shadow: 0 0 0 2px #2271b1; outline: none; }
+.chic-settings__nav a.is-active { background: #fff; border-left-color: #2271b1; font-weight: 600; }
+.chic-settings__main { flex: 1; min-width: 0; }
+.chic-settings__title { margin: 0 0 12px; font-size: 1.4em; }
+.chic-settings__main .chic-subtabs { margin-bottom: 8px; }
+.chic-settings__save { position: sticky; bottom: 0; z-index: 10; margin-top: 8px; padding: 10px 0; background: #f0f0f1; border-top: 1px solid #dcdcde; }
+.chic-settings__save .submit { margin: 0; padding: 0; }
+.chic-news-badge { display: inline-block; padding: 1px 7px; border-radius: 9px; background: #d63638; color: #fff; font-size: 11px; font-weight: 400; line-height: 16px; }
+@media (max-width: 782px) {
+	.chic-settings__layout { flex-direction: column; }
+	.chic-settings__nav { position: static; flex-basis: auto; width: 100%; }
+}
+
+/* Présentation des fonctions Pro (version gratuite) */
+.chic-pro-upsell { margin: 24px 0 8px; padding-top: 16px; border-top: 1px solid #dcdcde; max-width: 720px; }
+.chic-pro-upsell__title { margin: 0 0 8px; font-size: 14px; }
+.chic-pro-upsell__list { margin: 0; }
+.chic-pro-upsell__item { margin: 0; border-bottom: 1px solid #f0f0f1; }
+.chic-pro-upsell__item summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; cursor: pointer; list-style: none; color: #50575e; }
+.chic-pro-upsell__item summary::-webkit-details-marker { display: none; }
+.chic-pro-upsell__item summary:focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
+.chic-pro-upsell__badge { padding: 0 6px; border: 1px solid #8c8f94; border-radius: 3px; font-size: 11px; line-height: 18px; color: #50575e; }
+.chic-pro-upsell__why { margin-left: auto; color: #2271b1; text-decoration: underline; }
+.chic-pro-upsell__item p { margin: 0 0 8px; color: #50575e; }
+.chic-pro-upsell__links { display: flex; flex-wrap: wrap; gap: 16px; padding-bottom: 6px; }
+
+/* Fenêtre d'activation des statistiques */
+.chic-onboarding{position:fixed;inset:0;z-index:100000;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.chic-onboarding__dialog{background:#fff;border-radius:8px;max-width:520px;width:100%;padding:24px 28px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.chic-onboarding__dialog h2{margin:0 0 8px;font-size:18px}
+.chic-onboarding__dialog p{font-size:14px;color:#3c434a;margin:0 0 16px}
+.chic-onboarding__share{display:flex;gap:10px;align-items:flex-start;background:#f6f7f7;border-radius:6px;padding:12px;font-size:13px;line-height:1.5;color:#1d2327}
+.chic-onboarding__share input{margin-top:3px}
+.chic-onboarding__share em{display:block;color:#50575e;font-style:normal;margin-top:4px}
+.chic-onboarding__actions{display:flex;gap:16px;align-items:center;margin-top:20px}

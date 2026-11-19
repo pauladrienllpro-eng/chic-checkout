@@ -16,6 +16,9 @@ if ( !defined( 'ABSPATH' ) ) {
 class Cart_Assets {
     const HANDLE = 'chic-checkout-cart-app';
 
+    /** Nombre de produits proposés par le carrousel de ventes additionnelles. */
+    const UPSELL_COUNT = 4;
+
     /** Mêmes handles que Assets::DEFAULT_STYLE_HANDLES/DEFAULT_SCRIPT_HANDLES, sans les
      * scripts propres au formulaire de checkout classique (absent de cette page). */
     const DEFAULT_STYLE_HANDLES = array(
@@ -62,9 +65,6 @@ class Cart_Assets {
                 wp_dequeue_script( $handle );
             }
         }
-        if ( 'custom' === Settings::get()['style_mode'] ) {
-            wp_dequeue_style( 'global-styles' );
-        }
     }
 
     public function enqueue() : void {
@@ -85,6 +85,7 @@ class Cart_Assets {
             $this->enqueue_build_assets();
         }
         wp_set_script_translations( self::HANDLE, 'chic-checkout', CHIC_CHECKOUT_DIR . 'languages' );
+        Assets::enqueue_shell_styles( true );
         $this->localize_config();
     }
 
@@ -93,7 +94,9 @@ class Cart_Assets {
             return;
         }
         $dev_server = 'http://localhost:5173';
-        printf( '<script type="module">import RefreshRuntime from "%1$s/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>(type)=>type;window.__vite_plugin_react_preamble_installed__=true;</script>', esc_url( $dev_server ) );
+        wp_print_inline_script_tag( sprintf( 'import RefreshRuntime from "%1$s/@react-refresh";RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>(type)=>type;window.__vite_plugin_react_preamble_installed__=true;', esc_url_raw( $dev_server ) ), array(
+            'type' => 'module',
+        ) );
     }
 
     private function is_dev_server_running() : bool {
@@ -103,7 +106,7 @@ class Cart_Assets {
     private function enqueue_dev_assets() : void {
         $dev_server = 'http://localhost:5173';
         wp_enqueue_script(
-            'vite-client',
+            'chic-checkout-vite-client',
             $dev_server . '/@vite/client',
             array(),
             null,
@@ -112,7 +115,7 @@ class Cart_Assets {
         wp_enqueue_script(
             self::HANDLE,
             $dev_server . '/src/main-cart.tsx',
-            array('vite-client', 'wp-i18n'),
+            array('chic-checkout-vite-client', 'wp-i18n'),
             null,
             true
         );
@@ -152,7 +155,7 @@ class Cart_Assets {
     }
 
     public function add_module_type( string $tag, string $handle ) : string {
-        if ( 'vite-client' !== $handle && self::HANDLE !== $handle ) {
+        if ( 'chic-checkout-vite-client' !== $handle && self::HANDLE !== $handle ) {
             return $tag;
         }
         // Voir Assets::module_script_tag() : seule la balise du fichier JS est modifiée.
@@ -202,29 +205,20 @@ class Cart_Assets {
             'currencyCode'                => get_woocommerce_currency(),
             'logoUrl'                     => $logo_url,
             'logoText'                    => $logo_text,
-            'styleMode'                   => $settings['style_mode'],
-            'bgColor'                     => $settings['bg_color'],
-            'accentColor'                 => $settings['accent_color'],
-            'ctaColor'                    => $settings['cta_color'],
             'contactStyle'                => $settings['contact_style'],
             'contactLabel'                => Polylang_Strings::translate( $settings['contact_label'] ),
-            'contactIconUrl'              => ( $settings['contact_icon_id'] ? wp_get_attachment_image_url( $settings['contact_icon_id'], 'thumbnail' ) : '' ),
             'contactPopupTitle'           => Polylang_Strings::translate( $settings['contact_popup_title'] ),
             'contactPopupText'            => Polylang_Strings::translate( $settings['contact_popup_text'] ),
             'contactChannels'             => $this->resolve_contact_channels( $settings ),
             'reassuranceItems'            => $this->resolve_reassurance_items( $settings ),
             'pricesIncludeTax'            => 'incl' === get_option( 'woocommerce_tax_display_cart' ),
             'initialCart'                 => $initial_cart,
-            'cartImageSize'               => $settings['cart_image_size'],
             'cartPromoCodeEnabled'        => $settings['cart_promo_code_enabled'],
             'account'                     => $this->resolve_account(),
             'login'                       => array(
-                'introTitle'            => ( Polylang_Strings::translate( $settings['login_intro_title'] ) ?: __( 'Identification', 'chic-checkout' ) ),
-                'socialLogins'          => Assets::social_logins( $settings ),
-                'socialGoogleClientId'  => ( Edition::is_pro() ? $settings['social_google_client_id'] : '' ),
-                'socialAppleServicesId' => ( Edition::is_pro() ? $settings['social_apple_services_id'] : '' ),
-                'registrationEnabled'   => Auth_Api::registration_enabled(),
-                'ctaLabels'             => array(
+                'introTitle'          => ( Polylang_Strings::translate( $settings['login_intro_title'] ) ?: __( 'Identification', 'chic-checkout' ) ),
+                'registrationEnabled' => Auth_Api::registration_enabled(),
+                'ctaLabels'           => array(
                     'loginEmail'    => Polylang_Strings::translate( $settings['cta_login_email_label'] ),
                     'loginPassword' => Polylang_Strings::translate( $settings['cta_login_password_label'] ),
                     'loginGuest'    => Polylang_Strings::translate( $settings['cta_login_guest_label'] ),
@@ -239,13 +233,12 @@ class Cart_Assets {
             'cartUpsell'                  => array(
                 'enabled'  => $settings['cart_upsell_enabled'],
                 'title'    => Polylang_Strings::translate( $settings['cart_upsell_title'] ),
-                'maxCount' => $settings['cart_upsell_count'],
+                'maxCount' => self::UPSELL_COUNT,
                 'products' => $this->resolve_upsell_pool( $settings, $initial_cart ),
             ),
             'cartExpirationMessage'       => ( Integrations::is_enabled( 'bookacti' ) && function_exists( 'bookacti_get_message' ) ? bookacti_get_message( 'cart_countdown' ) : '' ),
             'integrations'                => Integrations::enabled_map(),
             'footerLinks'                 => $this->resolve_footer_links( $settings ),
-            'textOverrides'               => Assets::text_overrides(),
             'footerContrastToggleEnabled' => $settings['footer_contrast_toggle_enabled'],
             'footerContrastToggleLabel'   => Polylang_Strings::translate( $settings['footer_contrast_toggle_label'] ),
             'stats'                       => Stats_Settings::front_config(),
@@ -344,7 +337,8 @@ class Cart_Assets {
         if ( !$settings['cart_upsell_enabled'] ) {
             return array();
         }
-        $hidden_product_ids = array_merge( $settings['cart_packaging_product_ids'], $settings['cart_gift_carousel_product_ids'] );
+        // Emballages et produits offerts (version Pro) : jamais proposés en upsell.
+        $hidden_product_ids = array();
         $cart_product_ids = array();
         $regular_product_ids = array();
         $cart_prices = array();
@@ -390,7 +384,7 @@ class Cart_Assets {
         // branches ci-dessous plutôt qu'appliqué en filtre après coup : même l'étiquette
         // forcée ne peut pas passer outre.
         $excluded_ids = array_values( array_unique( array_merge( $cart_product_ids, $hidden_product_ids ) ) );
-        $pool_limit = max( (int) $settings['cart_upsell_count'] * 3, 12 );
+        $pool_limit = self::UPSELL_COUNT * 3;
         $pool_ids = null;
         // Version gratuite : ventes croisées des articles du panier (onglet Produits liés de
         // la fiche produit), puis produits liés de WooCommerce (catégories / étiquettes).
@@ -591,16 +585,14 @@ class Cart_Assets {
                 continue;
             }
             $is_preset = 'preset' === $row['icon_type'] && $row['icon_preset'];
-            // Image personnalisée : fonction Pro (icône prédéfinie seulement sinon).
-            $custom = !$is_preset && $row['icon_id'] && Edition::is_pro();
-            $items[] = array(
-                'iconUrl'      => ( $custom ? (string) wp_get_attachment_image_url( $row['icon_id'], 'thumbnail' ) : '' ),
+            $item = array(
                 'iconPreset'   => ( $is_preset ? $row['icon_preset'] : '' ),
                 'title'        => Polylang_Strings::translate( $row['title'] ),
                 'text'         => Polylang_Strings::translate( $row['text'] ),
                 'linkUrl'      => $row['link_url'],
                 'paymentIcons' => ( !empty( $row['show_payment_icons'] ) ? $payment_icons ??= self::resolve_payment_icons( true ) : array() ),
             );
+            $items[] = $item;
         }
         return $items;
     }

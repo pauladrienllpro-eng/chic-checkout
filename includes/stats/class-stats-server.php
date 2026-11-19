@@ -17,6 +17,11 @@
  * de paiement du checkout — compteurs express_* à part, et dimension `flow` sur les
  * commandes payées, pour que les taux du checkout restent comparables.
  *
+ * Parcours digital (depuis la 1.12.0) : panier sans livraison (produits virtuels ou
+ * téléchargeables), donc checkout sans étape Livraison. Sa part de chaque compteur du
+ * tunnel est comptée en plus dans digital_funnel (stage : cart, checkout, identification,
+ * payment, paid) ; Chic Insights en déduit le parcours physique (total − digital).
+ *
  * @package ChicCheckout
  */
 namespace ChicCheckout;
@@ -116,7 +121,11 @@ final class Stats_Server {
         }
     }
 
-    /** Une étape n'est comptée qu'une fois par jour et par panier. */
+    /**
+     * Une étape n'est comptée qu'une fois par jour et par panier. Panier digital (drapeau de
+     * session posé à l'affichage du checkout, mis à jour par la Store API) : aussi dans
+     * digital_funnel.
+     */
     private static function count_step_once( string $step ) : void {
         $data = self::session_data();
         if ( !empty( $data['steps'][$step] ) ) {
@@ -124,13 +133,46 @@ final class Stats_Server {
         }
         $data['steps'][$step] = 1;
         self::save_session_data( $data );
+        $device = self::device();
         Stats_Store::add(
             'step_reached',
-            self::device(),
+            $device,
             1,
             'step',
             $step
         );
+        if ( !empty( $data['digital'] ) && in_array( $step, array('identification', 'payment'), true ) ) {
+            Stats_Store::add(
+                'digital_funnel',
+                $device,
+                1,
+                'stage',
+                $step
+            );
+        }
+    }
+
+    /**
+     * Panier sans livraison (parcours digital : pas d'étape Livraison dans le checkout). Même
+     * critère que le front (Cart.needs_shipping de la Store API). Panier vide : non.
+     */
+    private static function is_digital_cart() : bool {
+        $cart = ( function_exists( 'WC' ) ? WC()->cart : null );
+        return $cart instanceof \WC_Cart && !$cart->is_empty() && !$cart->needs_shipping();
+    }
+
+    /** Commande sans article à livrer : même règle que WC_Cart::needs_shipping(), appliquée aux articles. */
+    private static function is_digital_order( \WC_Order $order ) : bool {
+        if ( !wc_shipping_enabled() || 0 === wc_get_shipping_method_count( true ) ) {
+            return true;
+        }
+        foreach ( $order->get_items() as $item ) {
+            $product = ( $item instanceof \WC_Order_Item_Product ? $item->get_product() : null );
+            if ( $product && $product->needs_shipping() ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -144,8 +186,12 @@ final class Stats_Server {
         register_rest_route( 'chic-checkout/v1', '/step-reached', array(
             'methods'             => 'POST',
             'callback'            => array($this, 'step_reached'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => array($this, 'check_rest_nonce'),
         ) );
+    }
+
+    public function check_rest_nonce( \WP_REST_Request $request ) : bool {
+        return (bool) wp_verify_nonce( (string) $request->get_header( 'X-WP-Nonce' ), 'wp_rest' );
     }
 
     public function step_reached( \WP_REST_Request $request ) : \WP_REST_Response {
@@ -182,14 +228,34 @@ final class Stats_Server {
         }
         $device = self::device();
         if ( Compat::should_render( $app ) ) {
+            $digital = self::is_digital_cart();
             if ( 'cart' === $app ) {
                 Stats_Store::add( 'cart_viewed', $device );
+                if ( $digital ) {
+                    Stats_Store::add(
+                        'digital_funnel',
+                        $device,
+                        1,
+                        'stage',
+                        'cart'
+                    );
+                }
                 return;
             }
             Stats_Store::add( 'checkout_started', $device );
+            if ( $digital ) {
+                Stats_Store::add(
+                    'digital_funnel',
+                    $device,
+                    1,
+                    'stage',
+                    'checkout'
+                );
+            }
             $data = self::session_data();
             // Marque la session : une commande PayPal (checkout classique) sera reconnue comme venant de l'app.
             $data['checkout'] = 1;
+            $data['digital'] = ( $digital ? 1 : 0 );
             self::save_session_data( $data );
             self::count_step_once( 'identification' );
             return;
@@ -261,6 +327,10 @@ final class Stats_Server {
         }
         if ( $ok ) {
             $needs_shipping = WC()->cart && WC()->cart->needs_shipping();
+            // Panier relu par la Store API : parcours digital à jour si le panier a changé.
+            $data = self::session_data();
+            $data['digital'] = ( $needs_shipping ? 0 : 1 );
+            self::save_session_data( $data );
             // Adresse de livraison envoyée ou mode de livraison choisi : étape Livraison. Le
             // choix du mode compte aussi, car un client connecté qui garde son adresse
             // enregistrée n'envoie pas d'adresse. Sans livraison (produits virtuels),
@@ -481,12 +551,6 @@ final class Stats_Server {
                 $has_upsell = true;
                 $upsell_cents += (int) round( ((float) $item->get_total() + (float) $item->get_total_tax()) * 100 );
             }
-            if ( in_array( $product_id, (array) $settings['cart_gift_carousel_product_ids'], true ) ) {
-                $has_free = true;
-            }
-            if ( in_array( $product_id, (array) $settings['cart_packaging_product_ids'], true ) ) {
-                $has_wrapping = true;
-            }
         }
         $gift = false;
         $message = false;
@@ -589,6 +653,15 @@ final class Stats_Server {
             'flow',
             $flow
         );
+        if ( 'checkout' === $flow && self::is_digital_order( $order ) ) {
+            Stats_Store::add(
+                'digital_funnel',
+                $device,
+                1,
+                'stage',
+                'paid'
+            );
+        }
         Stats_Store::add(
             'revenue_cents_by',
             $device,

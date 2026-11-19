@@ -68,7 +68,7 @@ function ReassuranceList({ items }) {
   return /* @__PURE__ */ jsx("div", { className: "chic-reassurance", children: items.map((item, index) => {
     const PresetIcon = item.iconPreset ? PRESET_ICONS[item.iconPreset] : void 0;
     return /* @__PURE__ */ jsxs("div", { className: "chic-reassurance__item", children: [
-      PresetIcon ? /* @__PURE__ */ jsx("span", { className: "chic-reassurance__icon chic-reassurance__icon--preset", children: /* @__PURE__ */ jsx(PresetIcon, {}) }) : item.iconUrl && /* @__PURE__ */ jsx("img", { src: item.iconUrl, alt: "", className: "chic-reassurance__icon" }),
+      PresetIcon ? /* @__PURE__ */ jsx("span", { className: "chic-reassurance__icon chic-reassurance__icon--preset", children: /* @__PURE__ */ jsx(PresetIcon, {}) }) : false,
       /* @__PURE__ */ jsxs("div", { className: "chic-reassurance__body", children: [
         /* @__PURE__ */ jsx("strong", { children: item.title }),
         item.text && /* @__PURE__ */ jsx("span", { children: item.text }),

@@ -4,7 +4,7 @@ Tags: woocommerce, checkout, cart, one page checkout, conversion
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.11.2
+Stable tag: 1.12.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -102,14 +102,27 @@ On the [plugin support forum](https://wordpress.org/support/plugin/chic-checkout
 The plugin connects to an external service only when the matching feature is set up by the site administrator, or after their explicit consent.
 
 * **Freemius** (plugin account and Pro version management). Only if the administrator accepts the opt-in shown after installation: administrator email, first and last name, site address, plugin version and status (active, deactivated, uninstalled); WordPress and PHP versions only if "Diagnostic info" is checked. [Terms](https://freemius.com/terms/) · [Privacy](https://freemius.com/privacy/)
-* **Chic Insights** (the developer's statistics service, hosted by Supabase in the European Union). Only if the administrator turns on "My statistics" and then sharing (Settings → Statistics, both off by default): daily aggregated counters, with no personal data of customers and without the store address. Turning sharing off requests the deletion of the data already sent. [Terms](https://pauladrien.fr/chic-checkout/cgv/)
-* **Stripe** (Stripe.js, js.stripe.com), on the checkout, when Payment Plugins for Stripe WooCommerce is active: card and wallet payment forms. [Terms](https://stripe.com/legal) · [Privacy](https://stripe.com/privacy)
+* **Chic Insights** (statistics API run by the plugin developer (pauladrien.fr), at qttpbbtohzftyitewfnp.supabase.co, hosted by Supabase in the European Union). Used only if the administrator turns on "My statistics" and then "Share" (Settings → Statistics, both off by default), to compare the store's checkout with other stores and improve the plugin.
+  * What is sent: once a day, the previous day's aggregated counters (carts and checkouts shown, steps reached, paid orders and their split by payment method, shipping method, country, hour and device type, use of checkout features, display errors), with a random site identifier and a technical profile of the store: plugin, WordPress, WooCommerce and PHP versions, theme (from a fixed list, otherwise "other"), store country, currency and optional category, enabled integrations, active payment gateways and cache plugins detected. No personal data of customers (no name, email, address, IP address, typed text, product or visitor identifier) and no store address.
+  * When: the daily send (WP-Cron), the benchmark shown on the Performance screen (read only), and a deletion request when sharing is turned off, which deletes the data already sent.
+  * [Terms and data protection (section 13)](https://pauladrien.fr/chic-checkout/cgv/) · Hosting: [Supabase terms](https://supabase.com/terms) · [Supabase privacy](https://supabase.com/privacy)
+* **Stripe** (Stripe.js, js.stripe.com), on the cart and checkout, when Payment Plugins for Stripe WooCommerce is active: card and wallet payment forms. [Terms](https://stripe.com/legal) · [Privacy](https://stripe.com/privacy)
 * **PayPal** (JavaScript SDK, paypal.com), on the checkout, when the PayPal gateway by Payment Plugins is active. [Terms](https://www.paypal.com/legalhub/home) · [Privacy](https://www.paypal.com/legalhub/privacy-full)
 * **Google Maps Platform** (Places API, maps.googleapis.com), on the Shipping step, only when an API key is entered and the Google Places integration is on: address autocomplete. [Terms](https://cloud.google.com/maps-platform/terms) · [Privacy](https://policies.google.com/privacy)
-* **Google Analytics 4**, only when the GA4 integration is on (off by default): checkout funnel events, after visitor consent when the WP Consent API is present. [Terms](https://marketingplatform.google.com/about/analytics/terms/) · [Privacy](https://policies.google.com/privacy)
+* **Google Analytics 4**, only when the GA4 integration is on (off by default): checkout funnel events (steps, shipping and payment chosen, purchase with order total and products) are pushed to the Google Tag Manager / gtag.js already installed on the site, after visitor consent when the WP Consent API is present. The plugin itself does not load any Google script for this. [Terms](https://marketingplatform.google.com/about/analytics/terms/us/) · [Privacy](https://policies.google.com/privacy)
 * **Boxtal** and **La Poste**, on the Shipping step, when their plugins and the matching integration are active: pickup point map, loaded by the carrier's plugin.
 
 == Changelog ==
+
+= 1.12.1 =
+* WordPress.org review: the free version no longer contains any code of the Pro features; styles and scripts are loaded the WordPress way; external services documented in this readme.
+* Performance screen (free version): the blurred preview of the Pro screen is removed.
+
+= 1.12.0 =
+* New Performance screen: period picker (7 days, 30 days, 90 days, 12 months or custom dates), comparison with the previous period, and an explanation bubble for every figure.
+* Pro: revenue and order charts, step-by-step checkout funnel with drop-off between steps, payment methods, upsell and gift option impact on the average order value.
+* Pro: the funnel can be split between physical products and digital products (no shipping step), for accurate drop-off rates.
+* Local statistics are kept for 13 months (instead of 31 days) to allow the 12-month view.
 
 = 1.11.2 =
 * Plugin name: Chic-checkout.

@@ -246,6 +246,42 @@ final class Stats_Store {
 		);
 	}
 
+	/**
+	 * Compteurs jour par jour sur une période, pour les métriques demandées (courbes de
+	 * l'écran Performances). La clé primaire commence par le jour : lecture par plage.
+	 *
+	 * @param string[] $metrics
+	 * @return array<int, array{day:string,metric:string,dim_key:string,dim_value:string,value:int}>
+	 */
+	public static function daily_totals( string $from, string $to, array $metrics ): array {
+		global $wpdb;
+		$metrics = array_values( array_filter( $metrics, static fn( $metric ) => isset( Stats_Contract::counters()[ $metric ] ) ) );
+		if ( ! $metrics ) {
+			return array();
+		}
+		$in = implode( ',', array_fill( 0, count( $metrics ), '%s' ) );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT day, metric, dim_key, dim_value, SUM(value) AS value FROM %i WHERE day BETWEEN %s AND %s AND metric IN ($in) GROUP BY day, metric, dim_key, dim_value", array_merge( array( self::counters_table(), $from, $to ), $metrics ) ), ARRAY_A );
+		return array_map(
+			static fn( $row ) => array(
+				'day'       => (string) $row['day'],
+				'metric'    => $row['metric'],
+				'dim_key'   => $row['dim_key'],
+				'dim_value' => $row['dim_value'],
+				'value'     => (int) $row['value'],
+			),
+			$rows ?: array()
+		);
+	}
+
+	/** Plus ancienne journée en base (null si aucune) : borne des périodes comparables. */
+	public static function first_day(): ?string {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
+		$day = $wpdb->get_var( $wpdb->prepare( 'SELECT MIN(day) FROM %i', self::counters_table() ) );
+		return $day ? (string) $day : null;
+	}
+
 	public static function delete_before( string $day ): void {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery

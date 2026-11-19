@@ -26,43 +26,23 @@ final class Edition {
     const SUPPORT_EMAIL = 'hello@pauladrien.fr';
 
     /**
-     * Le code Pro est-il présent (version Pro installée, licence valide ou non) ?
+     * Version Pro installée (licence valide ou non) ? Ne bride aucune fonction : sert à
+     * présenter la version Pro dans la version gratuite et à adapter les textes.
      */
     public static function has_pro_code() : bool {
         return false;
     }
 
-    /**
-     * Fonctions Pro actives : version Pro installée ET licence valide. Sinon, la boutique
-     * fonctionne avec les fonctions gratuites (réglages Pro conservés, voir
-     * Settings::get()).
-     */
-    public static function is_pro() : bool {
-        return false;
-    }
-
     /** 'pro' ou 'free' (statistiques : champ edition). */
     public static function name() : string {
-        return ( self::is_pro() ? 'pro' : 'free' );
-    }
-
-    /**
-     * Plan Freemius actif ('starter', 'pro', 'agence'), 'free' sans fonctions Pro.
-     */
-    public static function plan() : string {
         return 'free';
-    }
-
-    /** Marque blanche (plan Agence) : aucune mention de Chic-checkout ni de Freemius. */
-    public static function is_whitelabeled() : bool {
-        return false;
     }
 
     /**
      * Page de paiement Freemius dans l'administration (« Passer en Pro »).
      */
     public static function upgrade_url() : string {
-        return cc_fs()->get_upgrade_url();
+        return chic_checkout_fs()->get_upgrade_url();
     }
 
     /**

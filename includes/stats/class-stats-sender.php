@@ -35,8 +35,12 @@ final class Stats_Sender {
 
     const MAX_DAYS = 7;
 
-    /** Journées gardées localement : 30 jours pour l'écran Performances, + marge. */
-    const KEEP_DAYS = 31;
+    /**
+     * Journées gardées localement (compteurs agrégés, sans donnée personnelle) : 13 mois,
+     * pour la période « 12 mois » de l'écran Performances et la comparaison des périodes
+     * plus courtes avec la précédente. Sans effet sur l'envoi (MAX_DAYS).
+     */
+    const KEEP_DAYS = 400;
 
     public function __construct() {
         add_action( self::HOOK, array(self::class, 'run') );
@@ -402,7 +406,7 @@ final class Stats_Sender {
                 break;
             }
         }
-        $plan = Edition::plan();
+        $plan = 'free';
         $template = (string) get_template();
         $settings = Stats_Settings::get();
         return array(
@@ -477,12 +481,6 @@ final class Stats_Sender {
         $missing = array();
         if ( Integrations::is_enabled( 'google_places' ) && '' === trim( (string) $settings['google_places_api_key'] ) ) {
             $missing[] = 'google_places_api_key';
-        }
-        if ( Integrations::is_enabled( 'google_login' ) && '' === trim( (string) $settings['social_google_client_id'] ) ) {
-            $missing[] = 'social_google_client_id';
-        }
-        if ( Integrations::is_enabled( 'apple_login' ) && '' === trim( (string) $settings['social_apple_services_id'] ) ) {
-            $missing[] = 'social_apple_services_id';
         }
         return $missing;
     }

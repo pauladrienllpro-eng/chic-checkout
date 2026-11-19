@@ -5,6 +5,16 @@ pour WordPress.org. Une ligne « * … » par amélioration, en langage marchand
 
 == Changelog ==
 
+= 1.12.1 =
+* Relecture WordPress.org : la version gratuite ne contient plus de code des fonctions Pro, styles et scripts chargés selon les règles de WordPress, services externes détaillés dans le readme.
+* Écran Performances (version gratuite) : l'aperçu flouté de l'écran Pro est retiré.
+
+= 1.12.0 =
+* Nouvel écran Performances : choix de la période (7 jours, 30 jours, 90 jours, 12 mois ou dates personnalisées), comparaison avec la période précédente, et une bulle d’explication « i » pour chaque chiffre.
+* Pro : courbes du chiffre d’affaires et des commandes, tunnel de commande étape par étape avec la part des clients qui partent entre deux étapes, moyens de paiement, effet de l’upsell et de l’option cadeau sur le panier moyen.
+* Pro : tunnel séparé entre produits physiques et produits digitaux (sans étape Livraison), pour des taux d’abandon justes.
+* Statistiques conservées 13 mois sur votre site (au lieu de 31 jours) pour la vue sur 12 mois.
+
 = 1.11.2 =
 * Nom de l'extension : Chic-checkout.
 * Kit Freemius rangé dans le dossier vendor (exigence des contrôles automatiques de WordPress.org).

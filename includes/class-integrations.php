@@ -30,6 +30,7 @@ class Integrations {
      *         WordPress.org (lien d'installation, voir Plugin_Links).
      */
     public static function definitions() : array {
+        $mycred_description = __( 'Paiement en points et solde de points du client sur le panier.', 'chic-checkout' );
         $definitions = array(
             'boxtal'        => array(
                 'label'       => __( 'Boxtal Connect', 'chic-checkout' ),
@@ -45,7 +46,7 @@ class Integrations {
             ),
             'mycred'        => array(
                 'label'       => __( 'myCred', 'chic-checkout' ),
-                'description' => ( Edition::has_pro_code() ? __( 'Paiement en points, solde de points sur le panier et points de fidélité gagnés (bannières à activer dans l\'onglet Panier).', 'chic-checkout' ) : __( 'Paiement en points et solde de points du client sur le panier.', 'chic-checkout' ) ),
+                'description' => $mycred_description,
                 'plugin'      => 'myCred',
                 'slug'        => 'mycred',
             ),
@@ -75,16 +76,15 @@ class Integrations {
      * défaut sont lus dès plugins_loaded).
      */
     public static function keys() : array {
-        return array(
+        $keys = array(
             'boxtal',
             'laposte',
             'mycred',
             'bookacti',
-            'google_login',
-            'apple_login',
             'google_places',
             'ga4'
         );
+        return $keys;
     }
 
     /**
@@ -114,13 +114,7 @@ class Integrations {
         return !empty( $integrations[$key] );
     }
 
-    /** Intégrations réservées aux fonctions Pro. */
-    const PRO_KEYS = array('google_login', 'apple_login');
-
     public static function is_enabled( string $key ) : bool {
-        if ( in_array( $key, self::PRO_KEYS, true ) && !Edition::is_pro() ) {
-            return false;
-        }
         return self::is_detected( $key ) && self::is_switched_on( $key );
     }
 
@@ -171,8 +165,6 @@ class Integrations {
                 'laposte'       => self::is_detected( 'laposte' ),
                 'mycred'        => self::is_detected( 'mycred' ),
                 'bookacti'      => self::is_detected( 'bookacti' ),
-                'google_login'  => (bool) ($stored['social_google_enabled'] ?? true),
-                'apple_login'   => (bool) ($stored['social_apple_enabled'] ?? true),
                 'google_places' => true,
                 'ga4'           => (bool) ($stored['tracking_ga4_enabled'] ?? false),
             );

@@ -45,21 +45,19 @@ final class Branding {
     public static function get() : array {
         $stored = get_option( self::OPTION_KEY, array() );
         $stored = ( is_array( $stored ) ? $stored : array() );
+        $default = false;
         return array(
-            'show' => ( array_key_exists( 'show', $stored ) ? (bool) $stored['show'] : Edition::is_pro() ),
+            'show' => ( array_key_exists( 'show', $stored ) ? (bool) $stored['show'] : $default ),
         );
     }
 
     public static function is_visible() : bool {
-        if ( Edition::is_whitelabeled() ) {
-            return false;
-        }
         return self::get()['show'];
     }
 
     /** Signature technique (attribut et meta generator) : jamais en marque blanche. */
     public static function signature_enabled() : bool {
-        return !Edition::is_whitelabeled();
+        return true;
     }
 
     /** Lien de la mention : page produit avec suivi de campagne. */
@@ -121,9 +119,9 @@ final class Branding {
 
     /**
      * Statistiques de la mention sur la confirmation (badge_shown / badge_clicked), page
-     * sans app React : petit script en ligne, seulement si les mesures navigateur sont
-     * possibles, et qui vérifie le consentement du visiteur avant chaque mesure. Envoi à
-     * la route REST du site, jamais à un tiers.
+     * sans app React : petit script (assets/js/branding-stats.js), seulement si les
+     * mesures navigateur sont possibles, qui vérifie le consentement du visiteur avant
+     * chaque mesure. Envoi à la route REST du site, jamais à un tiers.
      */
     private static function print_confirmation_stats_script() : void {
         if ( !Stats_Settings::browser_possible() ) {
@@ -133,24 +131,15 @@ final class Branding {
             'url'           => add_query_arg( '_wpnonce', wp_create_nonce( 'wp_rest' ), rest_url( Stats_Rest::NAMESPACE . Stats_Rest::ROUTE ) ),
             'withoutBanner' => Stats_Settings::get()['browser_without_banner'],
         );
-        ?>
-		<script>
-		window.addEventListener('load', function () {
-			var c = <?php 
-        echo wp_json_encode( $config );
-        ?>, el = document.getElementById('chic-branding-confirmation');
-			function allowed() {
-				return c.withoutBanner || (typeof window.wp_has_consent === 'function' && (window.wp_has_consent('statistics-anonymous') || window.wp_has_consent('statistics')));
-			}
-			function send(metric) {
-				if (!el || !allowed() || !navigator.sendBeacon) { return; }
-				navigator.sendBeacon(c.url, new Blob([JSON.stringify({ app: 'thankyou', browser: true, counters: [[metric, 'place', 'confirmation', 1]], histograms: [] })], { type: 'application/json' }));
-			}
-			send('badge_shown');
-			if (el) { el.querySelector('a').addEventListener('click', function () { send('badge_clicked'); }); }
-		});
-		</script>
-		<?php 
+        // Page déjà commencée : le script part dans le pied de page (wp_footer).
+        wp_enqueue_script(
+            'chic-checkout-branding-stats',
+            CHIC_CHECKOUT_URL . 'assets/js/branding-stats.js',
+            array(),
+            Assets::asset_version( 'assets/js/branding-stats.js' ),
+            true
+        );
+        wp_add_inline_script( 'chic-checkout-branding-stats', 'window.chicBrandingStats = ' . wp_json_encode( $config ) . ';', 'before' );
     }
 
     public function register() : void {

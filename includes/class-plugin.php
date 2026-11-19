@@ -54,6 +54,7 @@ final class Plugin {
         require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-server.php';
         require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-rest.php';
         require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-sender.php';
+        require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-dashboard.php';
         require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-performance.php';
         require_once CHIC_CHECKOUT_DIR . 'includes/stats/class-stats-onboarding.php';
         Integrations::maybe_migrate();

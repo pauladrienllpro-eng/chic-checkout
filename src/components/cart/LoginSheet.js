@@ -57,9 +57,9 @@ function LoginSheet({ open, reason, onClose }) {
               {
                 introTitle: reason === "express" ? __("Connectez-vous pour payer") : login.introTitle,
                 introText: reason === "express" ? __("Cette boutique demande un compte pour payer avec Apple Pay ou PayPal. Votre panier est conservé.") : __("Retrouvez vos adresses et suivez vos commandes. Votre panier est conservé."),
-                socialLogins: login.socialLogins,
-                socialGoogleClientId: login.socialGoogleClientId,
-                socialAppleServicesId: login.socialAppleServicesId,
+                socialLogins: [],
+                socialGoogleClientId: "",
+                socialAppleServicesId: "",
                 guestCheckoutEnabled: false,
                 registrationEnabled: login.registrationEnabled,
                 noAccountText: reason === "express" ? __("Le paiement express est réservé aux clients qui ont déjà un compte. Vérifiez votre email ou passez par « Aller au paiement ».") : __("La création de compte n’est pas ouverte sur cette boutique. Vérifiez votre email."),

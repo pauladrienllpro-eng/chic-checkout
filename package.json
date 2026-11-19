@@ -1,6 +1,6 @@
 {
   "name": "chic-checkout",
-  "version": "1.11.2",
+  "version": "1.12.1",
   "private": true,
   "description": "Chic-checkout (free version): source of the React bundle in build/",
   "license": "GPL-2.0-or-later",

@@ -4,7 +4,7 @@
  * Plugin Name:       Chic-checkout
  * Plugin URI:        https://pauladrien.fr/chic-checkout/
  * Description:       Remplace le panier, le checkout et la page de confirmation WooCommerce par un parcours en 3 étapes (Identification, Livraison, Paiement), basé sur la Store API.
- * Version:           1.11.2
+ * Version:           1.12.1
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Requires Plugins:  woocommerce
@@ -38,8 +38,8 @@ $chic_checkout_has_pro = is_dir( __DIR__ . '/includes/pro' );
 // fonctions de ce fichier sont toutes déclarées sous condition : une fonction déclarée
 // au premier niveau existe dès la compilation, avant ce return.
 if ( defined( 'CHIC_CHECKOUT_VERSION' ) ) {
-    if ( function_exists( 'cc_fs' ) && defined( 'CHIC_CHECKOUT_HAS_PRO' ) && CHIC_CHECKOUT_HAS_PRO !== $chic_checkout_has_pro ) {
-        cc_fs()->set_basename( $chic_checkout_has_pro, __FILE__ );
+    if ( function_exists( 'chic_checkout_fs' ) && defined( 'CHIC_CHECKOUT_HAS_PRO' ) && CHIC_CHECKOUT_HAS_PRO !== $chic_checkout_has_pro ) {
+        chic_checkout_fs()->set_basename( $chic_checkout_has_pro, __FILE__ );
         return;
     }
     add_action( 'admin_notices', static function () {
@@ -49,7 +49,7 @@ if ( defined( 'CHIC_CHECKOUT_VERSION' ) ) {
     } );
     return;
 }
-define( 'CHIC_CHECKOUT_VERSION', '1.11.2' );
+define( 'CHIC_CHECKOUT_VERSION', '1.12.1' );
 define( 'CHIC_CHECKOUT_FILE', __FILE__ );
 define( 'CHIC_CHECKOUT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CHIC_CHECKOUT_URL', plugin_dir_url( __FILE__ ) );
@@ -59,19 +59,19 @@ define( 'CHIC_CHECKOUT_HAS_PRO', $chic_checkout_has_pro );
 if ( !defined( 'CHIC_CHECKOUT_FEEDBACK_URL' ) ) {
     define( 'CHIC_CHECKOUT_FEEDBACK_URL', '' );
 }
-if ( !function_exists( 'cc_fs' ) ) {
+if ( !function_exists( 'chic_checkout_fs' ) ) {
     /**
      * Accès unique au SDK Freemius : compte, partage de données (opt-in), page de
      * tarifs et, dans la version Pro seulement, licence et mises à jour. Le code qui
      * dépend de la licence n'existe que dans la version Pro (Edition, License).
      */
-    function cc_fs() {
-        global $cc_fs;
-        if ( !isset( $cc_fs ) ) {
+    function chic_checkout_fs() {
+        global $chic_checkout_fs;
+        if ( !isset( $chic_checkout_fs ) ) {
             // SDK dans vendor/ (emplacement recommandé par Freemius) : les contrôles automatiques
             // de WordPress.org le traitent comme une dépendance tierce.
             require_once __DIR__ . '/vendor/freemius/start.php';
-            $cc_fs = fs_dynamic_init( array(
+            $chic_checkout_fs = fs_dynamic_init( array(
                 'id'               => '42241',
                 'slug'             => 'chic-checkout',
                 'premium_slug'     => 'chic-checkout-premium',
@@ -91,18 +91,18 @@ if ( !function_exists( 'cc_fs' ) ) {
                 'is_live'          => true,
             ) );
         }
-        return $cc_fs;
+        return $chic_checkout_fs;
     }
 
-    cc_fs();
+    chic_checkout_fs();
     // Rien au-delà du strict nécessaire (permissions « essentials » et « events ») :
     // diagnostic et liste des extensions décochés par défaut.
-    cc_fs()->add_filter( 'permission_diagnostic_default', '__return_false' );
-    cc_fs()->add_filter( 'permission_extensions_default', '__return_false' );
-    cc_fs()->add_filter( 'show_deactivation_feedback_form', '__return_false' );
+    chic_checkout_fs()->add_filter( 'permission_diagnostic_default', '__return_false' );
+    chic_checkout_fs()->add_filter( 'permission_extensions_default', '__return_false' );
+    chic_checkout_fs()->add_filter( 'show_deactivation_feedback_form', '__return_false' );
     // Notices du SDK (proposition d'opt-in, mises à niveau…) : seulement sur les écrans
     // Chic-checkout, jamais sur le reste de l'administration (règle 11 de WordPress.org).
-    cc_fs()->add_filter( 'show_admin_notice', static function ( $show ) {
+    chic_checkout_fs()->add_filter( 'show_admin_notice', static function ( $show ) {
         $page = ( isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '' );
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         return $show && 0 === strpos( $page, 'chic-checkout' );
@@ -117,8 +117,8 @@ if ( !function_exists( 'cc_fs' ) ) {
     }
     // Remplace uninstall.php (recommandation Freemius : le SDK doit pouvoir signaler la
     // désinstallation, ce qu'un uninstall.php l'empêcherait de faire).
-    cc_fs()->add_action( 'after_uninstall', 'chic_checkout_uninstall' );
-    do_action( 'cc_fs_loaded' );
+    chic_checkout_fs()->add_action( 'after_uninstall', 'chic_checkout_uninstall' );
+    do_action( 'chic_checkout_fs_loaded' );
 }
 require_once CHIC_CHECKOUT_DIR . 'includes/class-plugin.php';
 /**

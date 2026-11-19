@@ -192,39 +192,6 @@ class Settings {
         ),
     );
 
-    /**
-     * Réglages des fonctions Pro et leur valeur dans l'édition gratuite (fonction
-     * désactivée, ou comportement par défaut). Simple liste de clés : aucune logique Pro.
-     */
-    const FREE_VALUES = array(
-        'style_mode'                     => 'theme',
-        'bg_color'                       => '#ffffff',
-        'accent_color'                   => '#1c1917',
-        'cta_color'                      => '#44403c',
-        'cart_image_size'                => 'lg',
-        'payment_logo_mode'              => 'beside',
-        'payment_logos'                  => array(),
-        'shipping_info_banner_text'      => '',
-        'social_google_enabled'          => false,
-        'social_apple_enabled'           => false,
-        'contact_icon_id'                => 0,
-        'field_patterns'                 => array(),
-        'text_overrides'                 => array(),
-        'review_enabled'                 => false,
-        'cart_promo_banner_enabled'      => false,
-        'cart_packaging_enabled'         => false,
-        'cart_gift_message_enabled'      => false,
-        'cart_gift_carousel_enabled'     => false,
-        'cart_free_shipping_enabled'     => false,
-        'cart_loyalty_enabled'           => false,
-        'checkout_loyalty_enabled'       => false,
-        'cart_express_login_required'    => false,
-        'cart_express_applepay_enabled'  => false,
-        'cart_express_googlepay_enabled' => false,
-        'cart_express_paypal_enabled'    => false,
-        'cart_upsell_count'              => 4,
-    );
-
     /** Toutes les clés de réglages propres aux fonctions Pro (conservées par la version gratuite). */
     const PRO_KEYS = array(
         'style_mode',
@@ -370,6 +337,29 @@ class Settings {
         add_action( 'admin_menu', array($this, 'register_page') );
         add_action( 'admin_init', array($this, 'register_settings') );
         add_action( 'admin_enqueue_scripts', array($this, 'enqueue_admin_assets') );
+        add_action( 'admin_enqueue_scripts', array($this, 'enqueue_admin_ui') );
+    }
+
+    /** Styles des écrans Chic-checkout (réglages, Performances) et fenêtre d'activation des statistiques. */
+    public function enqueue_admin_ui( string $hook ) : void {
+        if ( !in_array( $hook, Stats_Onboarding::SCREENS, true ) ) {
+            return;
+        }
+        wp_enqueue_style(
+            'chic-checkout-admin-ui',
+            CHIC_CHECKOUT_URL . 'assets/css/admin.css',
+            array(),
+            Assets::asset_version( 'assets/css/admin.css' )
+        );
+        if ( Stats_Onboarding::should_show() ) {
+            wp_enqueue_script(
+                'chic-checkout-stats-onboarding',
+                CHIC_CHECKOUT_URL . 'assets/js/stats-onboarding.js',
+                array(),
+                Assets::asset_version( 'assets/js/stats-onboarding.js' ),
+                true
+            );
+        }
     }
 
     /**
@@ -386,20 +376,13 @@ class Settings {
     }
 
     /**
-     * Réglages appliqués à la boutique. Sans fonctions Pro (version gratuite, ou version
-     * Pro sans licence valide), les réglages Pro prennent leur valeur de l'édition
-     * gratuite : les fonctions Pro sont inactives, mais leurs réglages restent enregistrés
-     * (stored()) et reviennent tels quels avec une licence valide.
+     * Réglages appliqués à la boutique. Version Pro sans licence valide : les réglages
+     * Pro prennent leur valeur inactive (voir inactive_pro_values), mais
+     * restent enregistrés (stored()) et reviennent tels quels avec une licence valide.
      */
     public static function get() : array {
         $settings = self::stored();
-        if ( Edition::is_pro() ) {
-            return $settings;
-        }
-        $free = self::FREE_VALUES;
-        $free['cart_blocks_desktop'] = self::CART_BLOCKS_DESKTOP_DEFAULT;
-        $free['cart_blocks_mobile'] = self::CART_BLOCKS_MOBILE_DEFAULT;
-        return array_merge( $settings, $free );
+        return $settings;
     }
 
     /**
@@ -407,139 +390,77 @@ class Settings {
      * réglages, quelle que soit l'édition.
      */
     public static function stored() : array {
-        return wp_parse_args( get_option( self::OPTION_KEY, array() ), array(
-            'logo_id'                           => 0,
-            'logo_text'                         => '',
-            'order_summary_label'               => __( 'Récapitulatif de commande', 'chic-checkout' ),
-            'style_mode'                        => 'custom',
-            'bg_color'                          => '#ffffff',
-            'accent_color'                      => '#1c1917',
-            'cta_color'                         => '#44403c',
-            'show_stepper'                      => true,
-            'step_name_1'                       => __( 'Identification', 'chic-checkout' ),
-            'step_name_2'                       => __( 'Livraison', 'chic-checkout' ),
-            'step_name_3'                       => __( 'Paiement', 'chic-checkout' ),
-            'step_numbering'                    => false,
-            'cta_billing_label'                 => __( 'Continuer', 'chic-checkout' ),
-            'cta_payment_label'                 => __( 'Payer', 'chic-checkout' ),
-            'show_terms_checkbox'               => true,
-            'payment_logo_mode'                 => 'beside',
-            'payment_logos'                     => array(),
-            'terms_checkbox_label'              => __( "J'ai lu et j'accepte les [conditions générales de vente] du site.", 'chic-checkout' ),
-            'progressive_shipping_form'         => true,
-            'google_places_api_key'             => '',
-            'free_shipping_label'               => __( 'Offerte', 'chic-checkout' ),
-            'cta_shipping_address_label'        => __( 'Continuer', 'chic-checkout' ),
-            'cta_shipping_method_label'         => __( 'Continuer', 'chic-checkout' ),
-            'shipping_lead_times'               => array(),
-            'shipping_info_banner_text'         => '',
-            'shipping_info_banner_link_url'     => '',
-            'back_label'                        => __( 'Panier', 'chic-checkout' ),
-            'back_target'                       => 'default',
-            'back_custom_url'                   => '',
-            'login_intro_title'                 => '',
-            'login_intro_text'                  => '',
-            'social_google_enabled'             => true,
-            'social_google_client_id'           => '',
-            'social_apple_enabled'              => true,
-            'social_apple_services_id'          => '',
-            'cta_login_email_label'             => __( 'Continuer', 'chic-checkout' ),
-            'cta_login_password_label'          => __( 'Se connecter', 'chic-checkout' ),
-            'cta_login_guest_label'             => __( 'Continuer en invité', 'chic-checkout' ),
-            'cta_login_register_label'          => __( 'Créer mon compte', 'chic-checkout' ),
-            'contact_style'                     => 'icon',
-            'contact_label'                     => __( 'Contact', 'chic-checkout' ),
-            'contact_icon_id'                   => 0,
-            'contact_popup_title'               => __( 'Nous contacter', 'chic-checkout' ),
-            'contact_popup_text'                => '',
-            'contact_page_enabled'              => false,
-            'contact_page_url'                  => '',
-            'contact_email_enabled'             => false,
-            'contact_email_address'             => '',
-            'contact_whatsapp_enabled'          => false,
-            'contact_whatsapp_number'           => '',
-            'contact_phone_enabled'             => false,
-            'contact_phone_number'              => '',
-            'contact_phone_days'                => array(),
-            'contact_phone_start'               => '',
-            'contact_phone_end'                 => '',
-            'field_patterns'                    => array(),
-            'footer_links'                      => array(),
-            'footer_contrast_toggle_enabled'    => true,
-            'footer_contrast_toggle_label'      => __( 'Contraste élevé', 'chic-checkout' ),
-            'reassurance_items'                 => array(),
-            'reassurance_mobile_enabled'        => false,
-            'thankyou_intro_text'               => __( 'Merci pour votre commande, {prenom} !', 'chic-checkout' ),
-            'thankyou_show_delivery_estimate'   => true,
-            'thankyou_back_label'               => __( 'Continuer mes achats', 'chic-checkout' ),
-            'thankyou_back_target'              => 'default',
-            'thankyou_back_custom_url'          => '',
-            'review_enabled'                    => false,
-            'review_delay'                      => 2,
-            'review_rating_enabled'             => true,
-            'review_comment_enabled'            => true,
-            'review_comment_required'           => false,
-            'review_title'                      => __( 'Comment s’est passée votre commande ?', 'chic-checkout' ),
-            'cart_promo_banner_enabled'         => false,
-            'cart_promo_banner_text'            => '',
-            'cart_promo_banner_link_url'        => '',
-            'cart_promo_banner_ends_at'         => '',
-            'cart_promo_banner_bg_color'        => '#e7e5e4',
-            'cart_promo_banner_position'        => 'inline',
-            'cart_promo_banner_sticky'          => false,
-            'cart_promo_banner_countdown'       => 'days',
-            'cart_image_size'                   => 'md',
-            'cart_packaging_enabled'            => false,
-            'cart_packaging_product_ids'        => array(),
-            'cart_packaging_rules'              => array(),
-            'cart_packaging_auto_select'        => false,
-            'cart_gift_message_enabled'         => false,
-            'cart_gift_message_max_length'      => 200,
-            'cart_gift_message_allow_empty'     => true,
-            'cart_gift_message_image_id'        => 0,
-            'cart_gift_carousel_enabled'        => false,
-            'cart_gift_carousel_product_ids'    => array(),
-            'cart_gift_carousel_threshold'      => 0,
-            'cart_gift_carousel_title'          => __( 'Un petit cadeau avec votre commande', 'chic-checkout' ),
-            'cart_gift_carousel_text'           => __( 'Choisissez un échantillon offert à glisser dans votre colis.', 'chic-checkout' ),
-            'cart_back_target'                  => 'shop',
-            'cart_back_custom_url'              => '',
-            'cart_back_label'                   => __( 'Continuer mes achats', 'chic-checkout' ),
-            'empty_cart_text'                   => __( 'Votre panier est vide pour le moment.', 'chic-checkout' ),
-            'cart_payment_icons_enabled'        => false,
-            'cart_payment_icons_label'          => __( 'Paiement 100% sécurisé', 'chic-checkout' ),
-            'cart_free_shipping_enabled'        => false,
-            'cart_free_shipping_icon_id'        => 0,
-            'cart_free_shipping_threshold'      => 0,
-            'cart_free_shipping_text'           => __( 'Il vous reste {montant} à ajouter avant de débloquer la livraison gratuite', 'chic-checkout' ),
-            'cart_free_shipping_text_unlocked'  => __( 'Livraison gratuite débloquée', 'chic-checkout' ),
-            'cart_loyalty_enabled'              => false,
-            'checkout_loyalty_enabled'          => false,
-            'cart_loyalty_text'                 => __( 'Cet achat vous rapportera {points} points de fidélité', 'chic-checkout' ),
-            'cart_promo_code_enabled'           => true,
-            'cart_express_login_required'       => false,
-            'cart_express_applepay_enabled'     => false,
-            'cart_express_googlepay_enabled'    => false,
-            'cart_express_paypal_enabled'       => false,
-            'cart_upsell_enabled'               => false,
-            'cart_upsell_title'                 => __( 'Vous aimerez aussi', 'chic-checkout' ),
-            'cart_blocks_desktop'               => self::CART_BLOCKS_DESKTOP_DEFAULT,
-            'text_overrides'                    => array(),
-            'cart_blocks_mobile'                => self::CART_BLOCKS_MOBILE_DEFAULT,
-            'cart_upsell_count'                 => 4,
-            'cart_upsell_cheaper_enabled'       => true,
-            'cart_upsell_related_enabled'       => true,
-            'cart_upsell_forced_tag_ids'        => array(),
-            'cart_upsell_excluded_tag_ids'      => array(),
-            'cart_upsell_excluded_category_ids' => array(),
-            'seo_noindex'                       => true,
-            'seo_nofollow'                      => true,
-            'seo_meta_title'                    => '',
-            'seo_meta_description'              => '',
-            'tracking_ga4_enabled'              => false,
-            'tracking_debug_mode'               => false,
-            'integrations'                      => array_fill_keys( Integrations::keys(), false ),
-        ) );
+        $defaults = array(
+            'logo_id'                         => 0,
+            'logo_text'                       => '',
+            'order_summary_label'             => __( 'Récapitulatif de commande', 'chic-checkout' ),
+            'show_stepper'                    => true,
+            'step_name_1'                     => __( 'Identification', 'chic-checkout' ),
+            'step_name_2'                     => __( 'Livraison', 'chic-checkout' ),
+            'step_name_3'                     => __( 'Paiement', 'chic-checkout' ),
+            'step_numbering'                  => false,
+            'cta_billing_label'               => __( 'Continuer', 'chic-checkout' ),
+            'cta_payment_label'               => __( 'Payer', 'chic-checkout' ),
+            'show_terms_checkbox'             => true,
+            'terms_checkbox_label'            => __( "J'ai lu et j'accepte les [conditions générales de vente] du site.", 'chic-checkout' ),
+            'progressive_shipping_form'       => true,
+            'google_places_api_key'           => '',
+            'free_shipping_label'             => __( 'Offerte', 'chic-checkout' ),
+            'cta_shipping_address_label'      => __( 'Continuer', 'chic-checkout' ),
+            'cta_shipping_method_label'       => __( 'Continuer', 'chic-checkout' ),
+            'shipping_lead_times'             => array(),
+            'back_label'                      => __( 'Panier', 'chic-checkout' ),
+            'back_target'                     => 'default',
+            'back_custom_url'                 => '',
+            'login_intro_title'               => '',
+            'login_intro_text'                => '',
+            'cta_login_email_label'           => __( 'Continuer', 'chic-checkout' ),
+            'cta_login_password_label'        => __( 'Se connecter', 'chic-checkout' ),
+            'cta_login_guest_label'           => __( 'Continuer en invité', 'chic-checkout' ),
+            'cta_login_register_label'        => __( 'Créer mon compte', 'chic-checkout' ),
+            'contact_style'                   => 'icon',
+            'contact_label'                   => __( 'Contact', 'chic-checkout' ),
+            'contact_popup_title'             => __( 'Nous contacter', 'chic-checkout' ),
+            'contact_popup_text'              => '',
+            'contact_page_enabled'            => false,
+            'contact_page_url'                => '',
+            'contact_email_enabled'           => false,
+            'contact_email_address'           => '',
+            'contact_whatsapp_enabled'        => false,
+            'contact_whatsapp_number'         => '',
+            'contact_phone_enabled'           => false,
+            'contact_phone_number'            => '',
+            'contact_phone_days'              => array(),
+            'contact_phone_start'             => '',
+            'contact_phone_end'               => '',
+            'footer_links'                    => array(),
+            'footer_contrast_toggle_enabled'  => true,
+            'footer_contrast_toggle_label'    => __( 'Contraste élevé', 'chic-checkout' ),
+            'reassurance_items'               => array(),
+            'reassurance_mobile_enabled'      => false,
+            'thankyou_intro_text'             => __( 'Merci pour votre commande, {prenom} !', 'chic-checkout' ),
+            'thankyou_show_delivery_estimate' => true,
+            'thankyou_back_label'             => __( 'Continuer mes achats', 'chic-checkout' ),
+            'thankyou_back_target'            => 'default',
+            'thankyou_back_custom_url'        => '',
+            'cart_back_target'                => 'shop',
+            'cart_back_custom_url'            => '',
+            'cart_back_label'                 => __( 'Continuer mes achats', 'chic-checkout' ),
+            'empty_cart_text'                 => __( 'Votre panier est vide pour le moment.', 'chic-checkout' ),
+            'cart_payment_icons_enabled'      => false,
+            'cart_payment_icons_label'        => __( 'Paiement 100% sécurisé', 'chic-checkout' ),
+            'cart_promo_code_enabled'         => true,
+            'cart_upsell_enabled'             => false,
+            'cart_upsell_title'               => __( 'Vous aimerez aussi', 'chic-checkout' ),
+            'seo_noindex'                     => true,
+            'seo_nofollow'                    => true,
+            'seo_meta_title'                  => '',
+            'seo_meta_description'            => '',
+            'tracking_ga4_enabled'            => false,
+            'tracking_debug_mode'             => false,
+            'integrations'                    => array_fill_keys( Integrations::keys(), false ),
+        );
+        return wp_parse_args( get_option( self::OPTION_KEY, array() ), $defaults );
     }
 
     public function register_page() : void {
@@ -1179,10 +1100,11 @@ class Settings {
         $result = array();
         $shown = Integrations::definitions();
         foreach ( Integrations::keys() as $key ) {
-            // Absente de l'écran (intégration Pro dans la version gratuite) : valeur conservée.
+            // Absente de l'écran (plugin tiers non détecté) : valeur conservée.
             $result[$key] = ( isset( $shown[$key] ) && Integrations::is_detected( $key ) ? !empty( $raw[$key] ) : !empty( $previous[$key] ) );
         }
-        return $result;
+        // Intégrations d'une autre édition (version Pro installée auparavant) : conservées.
+        return array_merge( ( is_array( $previous ) ? $previous : array() ), $result );
     }
 
     /**
@@ -2874,28 +2796,6 @@ class Settings {
      * automatiquement).
      */
     public function render_support_contact_field() : void {
-        if ( Edition::is_whitelabeled() ) {
-            echo '<p style="margin-top:0;">' . esc_html__( 'Pour toute question sur votre checkout, contactez votre prestataire.', 'chic-checkout' ) . '</p>';
-            return;
-        }
-        if ( Edition::is_pro() ) {
-            ?>
-			<p style="margin-top:0;">
-				<?php 
-            esc_html_e( 'Support prioritaire par e-mail :', 'chic-checkout' );
-            ?>
-				<a href="<?php 
-            echo esc_url( 'mailto:' . Edition::SUPPORT_EMAIL );
-            ?>"><?php 
-            echo esc_html( Edition::SUPPORT_EMAIL );
-            ?></a>
-			</p>
-			<p class="description"><?php 
-            esc_html_e( 'Pour un bug, le formulaire ci-dessous joint automatiquement les versions de votre boutique et vos captures.', 'chic-checkout' );
-            ?></p>
-			<?php 
-            return;
-        }
         ?>
 		<p style="margin-top:0;">
 			<?php 
@@ -3571,6 +3471,11 @@ class Settings {
         }
     }
 
+    /** Couleurs et polices du thème actif : toujours, sauf design maison (version Pro). */
+    private static function uses_theme_design() : bool {
+        return true;
+    }
+
     /** Bandeaux d'information propres à certains panneaux. */
     private static function render_panel_notice( string $panel ) : void {
         if ( 'checkout-login' === $panel ) {
@@ -3593,7 +3498,7 @@ class Settings {
 				</p>
 			</div>
 			<?php 
-        } elseif ( 'appearance' === $panel && !Edition::is_pro() ) {
+        } elseif ( 'appearance' === $panel && self::uses_theme_design() ) {
             ?>
 			<p class="description" style="margin:0 0 1em;"><?php 
             esc_html_e( 'Le panier, le checkout et la page de confirmation reprennent les couleurs et les polices de votre thème actif (theme.json).', 'chic-checkout' );
@@ -3674,28 +3579,6 @@ class Settings {
         $panels = self::panel_fields();
         list( $active_tab, $active_sub ) = self::requested_tab( $layout );
         ?>
-		<style>
-			.chic-settings__layout { display: flex; gap: 24px; align-items: flex-start; margin-top: 16px; }
-			.chic-settings__nav { flex: 0 0 210px; position: sticky; top: 46px; }
-			.chic-settings__group { margin: 18px 0 6px; padding: 0 12px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #646970; }
-			.chic-settings__group:first-child { margin-top: 0; }
-			.chic-settings__nav ul { margin: 0; }
-			.chic-settings__nav li { margin: 0; }
-			.chic-settings__nav a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-left: 3px solid transparent; border-radius: 0 4px 4px 0; color: #1d2327; text-decoration: none; transition: background-color .15s; }
-			.chic-settings__nav a:hover { background: #fff; color: #2271b1; }
-			.chic-settings__nav a:focus { box-shadow: 0 0 0 2px #2271b1; outline: none; }
-			.chic-settings__nav a.is-active { background: #fff; border-left-color: #2271b1; font-weight: 600; }
-			.chic-settings__main { flex: 1; min-width: 0; }
-			.chic-settings__title { margin: 0 0 12px; font-size: 1.4em; }
-			.chic-settings__main .chic-subtabs { margin-bottom: 8px; }
-			.chic-settings__save { position: sticky; bottom: 0; z-index: 10; margin-top: 8px; padding: 10px 0; background: #f0f0f1; border-top: 1px solid #dcdcde; }
-			.chic-settings__save .submit { margin: 0; padding: 0; }
-			.chic-news-badge { display: inline-block; padding: 1px 7px; border-radius: 9px; background: #d63638; color: #fff; font-size: 11px; font-weight: 400; line-height: 16px; }
-			@media (max-width: 782px) {
-				.chic-settings__layout { flex-direction: column; }
-				.chic-settings__nav { position: static; flex-basis: auto; width: 100%; }
-			}
-		</style>
 		<div class="wrap chic-settings">
 			<h1><?php 
         esc_html_e( 'Chic-checkout', 'chic-checkout' );

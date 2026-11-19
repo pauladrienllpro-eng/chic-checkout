@@ -156,7 +156,6 @@ final class Pro_Upsell {
 			return;
 		}
 
-		self::print_styles();
 		?>
 		<div class="chic-pro-upsell">
 			<h3 class="chic-pro-upsell__title"><?php esc_html_e( 'Avec la version Pro', 'chic-checkout' ); ?></h3>
@@ -179,29 +178,6 @@ final class Pro_Upsell {
 				<?php endforeach; ?>
 			</ul>
 		</div>
-		<?php
-	}
-
-	private static function print_styles(): void {
-		static $printed = false;
-		if ( $printed ) {
-			return;
-		}
-		$printed = true;
-		?>
-		<style>
-			.chic-pro-upsell { margin: 24px 0 8px; padding-top: 16px; border-top: 1px solid #dcdcde; max-width: 720px; }
-			.chic-pro-upsell__title { margin: 0 0 8px; font-size: 14px; }
-			.chic-pro-upsell__list { margin: 0; }
-			.chic-pro-upsell__item { margin: 0; border-bottom: 1px solid #f0f0f1; }
-			.chic-pro-upsell__item summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; cursor: pointer; list-style: none; color: #50575e; }
-			.chic-pro-upsell__item summary::-webkit-details-marker { display: none; }
-			.chic-pro-upsell__item summary:focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
-			.chic-pro-upsell__badge { padding: 0 6px; border: 1px solid #8c8f94; border-radius: 3px; font-size: 11px; line-height: 18px; color: #50575e; }
-			.chic-pro-upsell__why { margin-left: auto; color: #2271b1; text-decoration: underline; }
-			.chic-pro-upsell__item p { margin: 0 0 8px; color: #50575e; }
-			.chic-pro-upsell__links { display: flex; flex-wrap: wrap; gap: 16px; padding-bottom: 6px; }
-		</style>
 		<?php
 	}
 }
