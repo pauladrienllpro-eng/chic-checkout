@@ -444,6 +444,7 @@ class Assets {
             'userEmail'                   => ( is_user_logged_in() ? wp_get_current_user()->user_email : '' ),
             'guestCheckoutEnabled'        => 'yes' === get_option( 'woocommerce_enable_guest_checkout' ),
             'registrationEnabled'         => Auth_Api::registration_enabled(),
+            'fieldStyle'                  => $settings['field_style'],
             'contactStyle'                => $settings['contact_style'],
             'contactLabel'                => Polylang_Strings::translate( $settings['contact_label'] ),
             'contactPopupTitle'           => Polylang_Strings::translate( $settings['contact_popup_title'] ),

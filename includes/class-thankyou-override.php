@@ -115,13 +115,15 @@ class Thankyou_Override {
                 $this->order = $candidate;
             }
         }
+        // Clé absente ou fausse : rien n'est touché (panier, commande en attente de
+        // paiement). Une visite forgée de cette URL ne peut pas vider la session d'un client.
+        if ( !$this->order ) {
+            return null;
+        }
         if ( WC()->session ) {
             unset(WC()->session->order_awaiting_payment);
         }
         wc_empty_cart();
-        if ( !$this->order ) {
-            return null;
-        }
         $customer_id = $this->order->get_customer_id();
         if ( $customer_id && get_current_user_id() !== $customer_id ) {
             $this->login_redirect_url = $this->order->get_checkout_order_received_url();

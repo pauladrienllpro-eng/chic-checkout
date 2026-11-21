@@ -184,6 +184,7 @@ class Settings {
         'appearance'        => array(
             'logo_id',
             'logo_text',
+            'field_style',
             'style_mode',
             'bg_color',
             'accent_color',
@@ -393,6 +394,7 @@ class Settings {
         $defaults = array(
             'logo_id'                         => 0,
             'logo_text'                       => '',
+            'field_style'                     => 'boxed',
             'order_summary_label'             => __( 'Récapitulatif de commande', 'chic-checkout' ),
             'show_stepper'                    => true,
             'step_name_1'                     => __( 'Identification', 'chic-checkout' ),
@@ -527,6 +529,13 @@ class Settings {
             'logo_text',
             __( 'Texte alternatif', 'chic-checkout' ),
             array($this, 'render_logo_text_field'),
+            self::PAGE_SLUG . '_appearance',
+            'chic_tab_appearance'
+        );
+        add_settings_field(
+            'field_style',
+            __( 'Style des champs', 'chic-checkout' ),
+            array($this, 'render_field_style_field'),
             self::PAGE_SLUG . '_appearance',
             'chic_tab_appearance'
         );
@@ -1015,6 +1024,7 @@ class Settings {
         $clean = array(
             'logo_id'                         => ( isset( $value['logo_id'] ) ? absint( $value['logo_id'] ) : 0 ),
             'logo_text'                       => sanitize_text_field( $value['logo_text'] ?? '' ),
+            'field_style'                     => ( in_array( $value['field_style'] ?? '', array('boxed', 'underline'), true ) ? $value['field_style'] : 'boxed' ),
             'order_summary_label'             => ( sanitize_text_field( $value['order_summary_label'] ?? '' ) ?: __( 'Récapitulatif de commande', 'chic-checkout' ) ),
             'show_stepper'                    => !empty( $value['show_stepper'] ),
             'step_name_1'                     => ( sanitize_text_field( $value['step_name_1'] ?? '' ) ?: __( 'Identification', 'chic-checkout' ) ),
@@ -1763,6 +1773,36 @@ class Settings {
 
     public function render_cta_login_register_label_field() : void {
         $this->render_cta_label_field( 'cta_login_register_label', __( 'Créer mon compte', 'chic-checkout' ) );
+    }
+
+    /** Champs du checkout, du panier et de la page de confirmation : encadrés ou soulignés. */
+    public function render_field_style_field() : void {
+        $settings = self::stored();
+        $options = array(
+            'boxed'     => __( 'Encadrés : bordure tout autour du champ', 'chic-checkout' ),
+            'underline' => __( 'Soulignés : un simple trait sous le champ, plus épuré', 'chic-checkout' ),
+        );
+        foreach ( $options as $value => $option_label ) {
+            ?>
+			<label style="display:block;margin-bottom:6px;">
+				<input
+					type="radio"
+					name="<?php 
+            echo esc_attr( self::OPTION_KEY );
+            ?>[field_style]"
+					value="<?php 
+            echo esc_attr( $value );
+            ?>"
+					<?php 
+            checked( $settings['field_style'], $value );
+            ?>
+				/>
+				<?php 
+            echo esc_html( $option_label );
+            ?>
+			</label>
+			<?php 
+        }
     }
 
     public function render_contact_style_field() : void {
@@ -2791,7 +2831,7 @@ class Settings {
 
     /**
      * Canal de support : forum WordPress.org et portail d'idées (version gratuite), e-mail
-     * prioritaire (version Pro), prestataire (marque blanche). Version gratuite : guide
+     * prioritaire (version Pro). Version gratuite : guide
      * pas à pas pour installer la version Pro après l'achat (jamais installée
      * automatiquement).
      */
@@ -2969,7 +3009,7 @@ class Settings {
 		</p>
 		<p class="description">
 			<?php 
-        esc_html_e( "Ces événements respectent automatiquement le consentement du visiteur (catégorie \"statistics\") si WP Consent API est installé — voir l'encart en haut de cet onglet.", 'chic-checkout' );
+        esc_html_e( "Ces événements ne sont envoyés qu'aux visiteurs ayant accepté les statistiques (catégorie \"statistics\" de WP Consent API). Sans WP Consent API, aucun événement n'est envoyé — voir l'encart en haut de cet onglet.", 'chic-checkout' );
         ?>
 		</p>
 		<table class="widefat" style="max-width:640px;margin-top:10px;">
@@ -3550,7 +3590,7 @@ class Settings {
 						<?php 
                 printf( 
                     /* translators: %s: lien vers la page d'installation du plugin WP Consent API */
-                    esc_html__( "Aucune API de consentement détectée. Sans elle, GA4, Google Places et la connexion sociale (Google/Apple) se chargeront sans vérification de consentement dès qu'ils sont configurés — à réserver aux sites hors obligation RGPD, ou installez %s (compatible avec la plupart des bandeaux de consentement, dont CookieYes) pour que ce plugin respecte le choix du visiteur.", 'chic-checkout' ),
+                    esc_html__( "Aucune API de consentement détectée : aucun événement GA4 n'est envoyé, faute de pouvoir connaître le choix du visiteur. Google Places et la connexion sociale (Google/Apple) se chargent sans vérification de consentement dès qu'ils sont configurés. Installez %s (compatible avec la plupart des bandeaux de consentement, dont CookieYes) pour activer GA4 et faire respecter le choix du visiteur à ces services.", 'chic-checkout' ),
                     '<a href="' . esc_url( admin_url( 'plugin-install.php?s=wp-consent-api&tab=search&type=term' ) ) . '" target="_blank" rel="noopener noreferrer">WP Consent API</a>'
                  );
                 ?>

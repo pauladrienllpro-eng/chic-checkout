@@ -9,7 +9,7 @@
  * boutiques comparables renvoyées par l'API benchmark, si elle les fournit.
  *
  * L'appel au benchmark n'a lieu qu'à l'ouverture de l'écran, au plus une fois par
- * 24 h et par période (transient). En marque blanche, aucune mention de Chic-checkout.
+ * 24 h et par période (transient).
  * Affichage : Stats_Dashboard (assets/css/performance.css, assets/js/performance.js).
  *
  * @package ChicCheckout

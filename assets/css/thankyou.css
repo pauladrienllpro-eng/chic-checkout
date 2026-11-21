@@ -606,6 +606,21 @@
   outline-offset: 2px;
 }
 
+/* Champs soulignés (Apparence → Style des champs) : trait du bas seul, plus épais au focus. */
+#chic-checkout-root .chic-checkout--fields-underline .chic-thankyou-verify input {
+  padding-left: 0;
+  padding-right: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-thankyou-verify input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--chic-accent);
+  box-shadow: 0 1px 0 0 var(--chic-accent);
+}
+
 #chic-checkout-root .chic-thankyou-fallback .chic-thankyou-verify__error {
   margin: 0;
   font-size: 0.85rem;

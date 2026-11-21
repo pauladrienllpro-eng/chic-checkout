@@ -3,22 +3,15 @@
 /**
  * Mention « Checkout par Chic-checkout » et signature technique.
  *
- * Toutes les règles d'affichage passent par Branding::is_visible() :
- *  - version gratuite (ou Pro sans licence valide) : désactivée par défaut, le marchand
- *    peut l'activer (Réglages → Apparence) ; jamais imposée (règle 10 de WordPress.org) ;
- *  - Pro, plan Starter : toujours affichée, non désactivable ;
- *  - Pro, plan Pro : affichée par défaut, interrupteur dans Réglages → Apparence ;
- *  - Pro, plan Agence ou licence en marque blanche : jamais.
- *
- * Emplacements : page de confirmation (principal) et, en petit, sous le bouton de
- * paiement. Jamais en haut du checkout, à côté des moyens de paiement ni dans les
- * e-mails WooCommerce. Texte et éventuelle icône SVG en ligne uniquement : aucune image,
- * aucun script ni pixel distant.
+ * Mention : désactivée par défaut, le marchand peut l'activer (Réglages → Apparence) ;
+ * jamais imposée (règle 10 de WordPress.org). Emplacements : page de confirmation
+ * (principal) et, en petit, sous le bouton de paiement. Jamais en haut du checkout, à
+ * côté des moyens de paiement ni dans les e-mails WooCommerce. Texte et éventuelle icône
+ * SVG en ligne uniquement : aucune image, aucun script ni pixel distant.
  *
  * Signature (voir DETECTION.md) : attribut data-chic-checkout="<version>" sur le conteneur
  * racine du panier, du checkout et de la confirmation, et <meta name="generator"> sur ces
- * seules pages (invisibles, sans lien) — sauf en marque blanche, où rien ne nomme
- * Chic-checkout.
+ * seules pages (invisibles, sans lien).
  *
  * @package ChicCheckout
  */
@@ -37,8 +30,7 @@ final class Branding {
     }
 
     /**
-     * Interrupteur du marchand. Jamais enregistré : désactivé dans la version gratuite,
-     * activé par défaut avec une licence Pro valide (plan Pro).
+     * Interrupteur du marchand. Jamais enregistré : désactivé.
      *
      * @return array{show:bool}
      */
@@ -53,11 +45,6 @@ final class Branding {
 
     public static function is_visible() : bool {
         return self::get()['show'];
-    }
-
-    /** Signature technique (attribut et meta generator) : jamais en marque blanche. */
-    public static function signature_enabled() : bool {
-        return true;
     }
 
     /** Lien de la mention : page produit avec suivi de campagne. */
@@ -78,23 +65,19 @@ final class Branding {
         );
     }
 
-    /** Attribut data-chic-checkout du conteneur racine des templates (rien en marque blanche). */
+    /** Attribut data-chic-checkout du conteneur racine des templates. */
     public static function print_root_attribute() : void {
-        if ( self::signature_enabled() ) {
-            echo ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"';
-        }
+        echo ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"';
     }
 
     /** Attribut du conteneur racine des templates. */
     public static function root_attribute() : string {
-        return ( self::signature_enabled() ? ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"' : '' );
+        return ' data-chic-checkout="' . esc_attr( CHIC_CHECKOUT_VERSION ) . '"';
     }
 
     /** <meta name="generator"> : uniquement dans les templates panier, checkout et confirmation. */
     public static function generator_meta() : void {
-        if ( self::signature_enabled() ) {
-            echo '<meta name="generator" content="' . esc_attr( 'Chic-checkout ' . CHIC_CHECKOUT_VERSION ) . '">' . "\n";
-        }
+        echo '<meta name="generator" content="' . esc_attr( 'Chic-checkout ' . CHIC_CHECKOUT_VERSION ) . '">' . "\n";
     }
 
     /** Mention de la page de confirmation (template PHP). */
@@ -128,8 +111,7 @@ final class Branding {
             return;
         }
         $config = array(
-            'url'           => add_query_arg( '_wpnonce', wp_create_nonce( 'wp_rest' ), rest_url( Stats_Rest::NAMESPACE . Stats_Rest::ROUTE ) ),
-            'withoutBanner' => Stats_Settings::get()['browser_without_banner'],
+            'url' => add_query_arg( '_wpnonce', wp_create_nonce( 'wp_rest' ), rest_url( Stats_Rest::NAMESPACE . Stats_Rest::ROUTE ) ),
         );
         // Page déjà commencée : le script part dans le pied de page (wp_footer).
         wp_enqueue_script(

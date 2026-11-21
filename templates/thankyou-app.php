@@ -57,6 +57,8 @@ wp_body_open();
 	<div
 		class="chic-checkout chic-checkout--<?php 
 echo esc_attr( $chic_checkout_style_mode );
+?> chic-checkout--fields-<?php 
+echo esc_attr( $chic_checkout_settings['field_style'] );
 ?>"
 		style="--chic-accent:<?php 
 echo esc_attr( $chic_checkout_accent );

@@ -13,8 +13,7 @@
  * Niveaux de mesure (partage uniquement pour le niveau 2) :
  *  - niveau 1 (serveur) : actif dès que le marchand a donné son accord ;
  *  - niveau 2 (navigateur) : seulement si la WP Consent API donne le consentement
- *    « statistics-anonymous » (ou « statistics ») du visiteur, ou si le marchand coche
- *    explicitement « sans bandeau de consentement ».
+ *    « statistics-anonymous » (ou « statistics ») du visiteur.
  *
  * Désactiver = arrêt immédiat de la collecte, purge locale et demande de suppression
  * signée à l'API (DELETE). Toujours possible, même licence expirée (lien dédié).
@@ -57,16 +56,15 @@ final class Stats_Settings {
         add_action( 'admin_post_' . self::SEND_NOW_ACTION, array($this, 'handle_send_now') );
     }
 
-    /** @return array{enabled:bool,share:bool,browser_without_banner:bool,category:string} */
+    /** @return array{enabled:bool,share:bool,category:string} */
     public static function get() : array {
         $stored = get_option( self::OPTION_KEY, array() );
         $stored = ( is_array( $stored ) ? $stored : array() );
         $enabled = !empty( $stored['enabled'] );
         return array(
-            'enabled'                => $enabled,
-            'share'                  => $enabled && (( array_key_exists( 'share', $stored ) ? !empty( $stored['share'] ) : true )),
-            'browser_without_banner' => !empty( $stored['browser_without_banner'] ),
-            'category'               => ( in_array( $stored['category'] ?? '', Stats_Contract::CATEGORIES, true ) ? $stored['category'] : '' ),
+            'enabled'  => $enabled,
+            'share'    => $enabled && (( array_key_exists( 'share', $stored ) ? !empty( $stored['share'] ) : true )),
+            'category' => ( in_array( $stored['category'] ?? '', Stats_Contract::CATEGORIES, true ) ? $stored['category'] : '' ),
         );
     }
 
@@ -87,17 +85,17 @@ final class Stats_Settings {
     public static function browser_possible() : bool {
         $settings = self::get();
         // Les mesures navigateur ne servent qu'au partage (aucun indicateur local ne les utilise).
-        return $settings['share'] && ($settings['browser_without_banner'] || function_exists( 'wp_has_consent' ));
+        // Sans WP Consent API, le choix du visiteur est inconnu : aucune mesure navigateur.
+        return $settings['share'] && function_exists( 'wp_has_consent' );
     }
 
     /** Configuration transmise au front (window.chicCheckout.stats). */
     public static function front_config() : array {
         $settings = self::get();
         return array(
-            'enabled'              => $settings['enabled'],
-            'browser'              => self::browser_possible(),
-            'browserWithoutBanner' => $settings['share'] && $settings['browser_without_banner'],
-            'url'                  => esc_url_raw( rest_url( Stats_Rest::NAMESPACE . Stats_Rest::ROUTE ) ),
+            'enabled' => $settings['enabled'],
+            'browser' => self::browser_possible(),
+            'url'     => esc_url_raw( rest_url( Stats_Rest::NAMESPACE . Stats_Rest::ROUTE ) ),
         );
     }
 
@@ -152,10 +150,9 @@ final class Stats_Settings {
         $value = ( is_array( $value ) ? $value : array() );
         $enabled = !empty( $value['enabled'] );
         return array(
-            'enabled'                => $enabled,
-            'share'                  => $enabled && !empty( $value['share'] ),
-            'browser_without_banner' => !empty( $value['browser_without_banner'] ),
-            'category'               => ( in_array( $value['category'] ?? '', Stats_Contract::CATEGORIES, true ) ? $value['category'] : '' ),
+            'enabled'  => $enabled,
+            'share'    => $enabled && !empty( $value['share'] ),
+            'category' => ( in_array( $value['category'] ?? '', Stats_Contract::CATEGORIES, true ) ? $value['category'] : '' ),
         );
     }
 
@@ -388,12 +385,18 @@ final class Stats_Settings {
     }
 
     public static function brand() : string {
-        return ( self::is_whitelabeled() ? __( "l'éditeur de cette extension de checkout", 'chic-checkout' ) : 'Chic-checkout' );
+        return 'Chic-checkout';
     }
 
-    /** Marque blanche (plan Agence de la version Pro) : aucune mention de Chic-checkout. */
-    private static function is_whitelabeled() : bool {
-        return false;
+    /** Lien vers les conditions générales. */
+    private static function print_terms_link() : void {
+        ?>
+		<a href="<?php 
+        echo esc_url( self::TERMS_URL );
+        ?>" target="_blank" rel="noopener noreferrer"><?php 
+        esc_html_e( 'Conditions générales', 'chic-checkout' );
+        ?></a>
+		<?php 
     }
 
     public function render_enabled_field() : void {
@@ -452,15 +455,7 @@ final class Stats_Settings {
         esc_html_e( 'Décocher arrête l’envoi et demande la suppression de toutes les données déjà partagées ; vos statistiques locales restent disponibles.', 'chic-checkout' );
         ?>
 				<?php 
-        if ( !self::is_whitelabeled() ) {
-            ?>
-					<a href="<?php 
-            echo esc_url( self::TERMS_URL );
-            ?>" target="_blank" rel="noopener noreferrer"><?php 
-            esc_html_e( 'Conditions générales', 'chic-checkout' );
-            ?></a>
-				<?php 
-        }
+        self::print_terms_link();
         ?>
 			</p>
 		</div>
@@ -470,14 +465,13 @@ final class Stats_Settings {
     /** Texte de la case de partage (onglet et fenêtre d'activation). */
     public static function share_label() : string {
         return sprintf( 
-            /* translators: %s: Chic-checkout, ou une formule neutre en marque blanche */
+            /* translators: %s: Chic-checkout */
             __( 'Je partage aussi des statistiques agrégées avec %s, sans aucune donnée de mes clients, pour me comparer aux boutiques similaires, améliorer le plugin et contribuer à des études sur l’e-commerce.', 'chic-checkout' ),
             self::brand()
          );
     }
 
     public function render_browser_field() : void {
-        $settings = self::get();
         ?>
 		<p class="description" style="margin-top:0;max-width:760px;">
 			<?php 
@@ -498,28 +492,10 @@ final class Stats_Settings {
         } else {
             ?>
 				<span style="color:#787c82;">○ <?php 
-            esc_html_e( 'WP Consent API non détectée : sans l’option ci-dessous, aucune mesure navigateur.', 'chic-checkout' );
+            esc_html_e( 'WP Consent API non détectée : aucune mesure navigateur.', 'chic-checkout' );
             ?></span>
 			<?php 
         }
-        ?>
-		</p>
-		<label>
-			<input type="checkbox" name="<?php 
-        echo esc_attr( self::OPTION_KEY );
-        ?>[browser_without_banner]" value="1" <?php 
-        checked( $settings['browser_without_banner'] );
-        ?> />
-			<?php 
-        esc_html_e( 'Activer les mesures navigateur sans bandeau de consentement', 'chic-checkout' );
-        ?>
-		</label>
-		<p class="description" style="max-width:760px;">
-			<strong><?php 
-        esc_html_e( 'Attention :', 'chic-checkout' );
-        ?></strong>
-			<?php 
-        esc_html_e( 'vérifiez que c’est conforme à votre situation (règles applicables aux mesures d’audience exemptées de consentement, information de vos clients dans votre politique de confidentialité). En cas de doute, laissez décoché et utilisez un bandeau compatible avec la WP Consent API.', 'chic-checkout' );
         ?>
 		</p>
 		<?php 

@@ -5,6 +5,20 @@ pour WordPress.org. Une ligne « * … » par amélioration, en langage marchand
 
 == Changelog ==
 
+= 1.13.1 =
+* Relecture WordPress.org : plus aucune trace de la marque blanche dans la version gratuite.
+* Confidentialité : les événements Google Analytics 4 ne partent qu'aux visiteurs ayant accepté les statistiques via WP Consent API, et plus du tout sans elle. L'option « mesures navigateur sans bandeau de consentement » est retirée.
+* Sécurité : à l'étape Identification de la version gratuite, le client choisit lui-même entre connexion, commande invité et création de compte ; le plugin ne révèle plus si un e-mail a un compte.
+* Sécurité : la page de confirmation ne vide le panier qu'après vérification de la clé de commande.
+
+= 1.13.0 =
+* Nouveau réglage Apparence → Style des champs : champs encadrés (par défaut) ou soulignés, un simple trait sous chaque champ, plus épuré.
+* Étape Identification : champs sur toute la largeur, boutons centrés.
+* Correctif : les boutons « Créer un compte » et « Continuer en invité » avaient perdu leur bordure.
+* Pro : boutons Google et Apple à la même taille, proposés en premier à l'étape Identification.
+* Pro : connexion avec Google et Apple sur la page Mon compte de WooCommerce.
+* Pro : connexion Apple depuis le panier avec l'URL de retour déclarée chez Apple (celle du checkout).
+
 = 1.12.1 =
 * Relecture WordPress.org : la version gratuite ne contient plus de code des fonctions Pro, styles et scripts chargés selon les règles de WordPress, services externes détaillés dans le readme.
 * Écran Performances (version gratuite) : l'aperçu flouté de l'écran Pro est retiré.

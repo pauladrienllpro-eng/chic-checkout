@@ -1551,6 +1551,71 @@ body:not(#_never) {
   border-color: #b91c1c !important;
 }
 
+/*
+ * Champs soulignés (Apparence → Style des champs) : trait du bas seul, libellé au-dessus
+ * (toujours visible), texte aligné sur le libellé. Le trait reste assez contrasté pour
+ * qu'on reconnaisse un champ ; au focus il s'épaissit et prend la couleur d'accent
+ * (box-shadow : aucun décalage de mise en page). Mêmes `!important` que ci-dessus.
+ */
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input:not([type='radio']):not([type='checkbox']),
+#chic-checkout-root .chic-checkout--fields-underline .chic-step select {
+  border-width: 0 0 1px !important;
+  border-color: color-mix(in srgb, var(--chic-text) 55%, transparent) !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  min-height: 44px;
+  padding: 0.5rem 0 !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-step select {
+  background-position: right 0 center;
+  padding-right: 1.75rem !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input:not([type='radio']):not([type='checkbox']):focus,
+#chic-checkout-root .chic-checkout--fields-underline .chic-step select:focus {
+  border-color: var(--chic-accent) !important;
+  box-shadow: 0 1px 0 0 var(--chic-accent) !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input[aria-invalid='true'],
+#chic-checkout-root .chic-checkout--fields-underline .chic-step select[aria-invalid='true'] {
+  border-color: #b91c1c !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input[aria-invalid='true']:focus,
+#chic-checkout-root .chic-checkout--fields-underline .chic-step select[aria-invalid='true']:focus {
+  box-shadow: 0 1px 0 0 #b91c1c !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-password-field input {
+  padding-right: 2.75rem !important;
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-password-toggle {
+  width: 2.25rem;
+  justify-content: flex-end;
+}
+
+/* Remplissage automatique du navigateur : pas de fond coloré sous un champ souligné. */
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--chic-surface) inset !important;
+  -webkit-text-fill-color: var(--chic-text);
+}
+
+#chic-checkout-root .chic-checkout--fields-underline .chic-step input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--chic-surface) inset, 0 1px 0 0 var(--chic-accent) !important;
+}
+
+/* E-mail validé (étape Identification) : même trait que les champs. */
+#chic-checkout-root .chic-checkout--fields-underline .chic-login-email-chip {
+  padding-left: 0;
+  padding-right: 0;
+  border-width: 0 0 1px;
+  border-color: color-mix(in srgb, var(--chic-text) 55%, transparent);
+  border-radius: 0;
+}
+
 #chic-checkout-root .chic-field-error {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
@@ -1719,6 +1784,22 @@ body:not(#_never) {
   color: var(--chic-text-muted);
 }
 
+/* Identification : les champs prennent toute la largeur de l'étape ; les boutons
+   (Google, Apple, choix du compte, bouton d'action) sont centrés sur 400 px au plus,
+   la largeur maximale du bouton rendu par Google. */
+#chic-checkout-root .chic-login-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#chic-checkout-root .chic-login-body .chic-login-form button[type='submit'],
+#chic-checkout-root .chic-login-body .chic-login-choice .chic-social-button {
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+}
+
 #chic-checkout-root .chic-login-form {
   display: flex;
   flex-direction: column;
@@ -1729,16 +1810,10 @@ body:not(#_never) {
   width: 100%;
 }
 
-@media (min-width: 1024px) {
-  #chic-checkout-root .chic-login-form button[type='submit'] {
-    width: auto;
-  }
-}
 
 
 
-
-#chic-checkout-root .chic-social-button {
+#chic-checkout-root .chic-checkout .chic-social-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1755,11 +1830,11 @@ body:not(#_never) {
   transition: border-color var(--chic-duration) var(--chic-ease);
 }
 
-#chic-checkout-root .chic-social-button:hover {
+#chic-checkout-root .chic-checkout .chic-social-button:hover {
   border-color: var(--chic-text-muted);
 }
 
-#chic-checkout-root .chic-social-button:disabled {
+#chic-checkout-root .chic-checkout .chic-social-button:disabled {
   opacity: 0.6;
   cursor: default;
 }
@@ -1767,6 +1842,11 @@ body:not(#_never) {
 /* Réserve la même hauteur que le bouton Apple à côté avant que le SDK Google n'ait fini
    de rendre son propre bouton dedans (léger écart de style inévitable — voir
    google-identity.ts — mais pas de saut de mise en page pendant le chargement). */
+
+/* Bouton Apple aligné sur le bouton rendu par Google (« large », contour) : 40 px de
+   haut, coins de 4 px, bordure #dadce0, texte 14 px. */
+
+
 
 #chic-checkout-root .chic-login-email-chip {
   display: flex;

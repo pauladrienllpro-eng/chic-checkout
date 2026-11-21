@@ -21,9 +21,6 @@ function browserMeasuresAllowed() {
   if (!stats || !stats.browser) {
     return false;
   }
-  if (stats.browserWithoutBanner) {
-    return true;
-  }
   const hasConsent = typeof window.wp_has_consent === "function" ? window.wp_has_consent : null;
   return !!hasConsent && (hasConsent("statistics-anonymous") === true || hasConsent("statistics") === true);
 }

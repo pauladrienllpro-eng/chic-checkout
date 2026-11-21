@@ -112,7 +112,7 @@ function CartApp() {
   return /* @__PURE__ */ jsxs(
     "div",
     {
-      className: `chic-checkout chic-checkout--${styleMode()} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
+      className: `chic-checkout chic-checkout--${styleMode()} chic-checkout--fields-${config.fieldStyle ?? "boxed"} ${highContrast ? "chic-checkout--high-contrast" : ""}`,
       style: {
         "--chic-accent": colors.accent,
         "--chic-bg": colors.bg,

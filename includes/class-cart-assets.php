@@ -205,6 +205,7 @@ class Cart_Assets {
             'currencyCode'                => get_woocommerce_currency(),
             'logoUrl'                     => $logo_url,
             'logoText'                    => $logo_text,
+            'fieldStyle'                  => $settings['field_style'],
             'contactStyle'                => $settings['contact_style'],
             'contactLabel'                => Polylang_Strings::translate( $settings['contact_label'] ),
             'contactPopupTitle'           => Polylang_Strings::translate( $settings['contact_popup_title'] ),

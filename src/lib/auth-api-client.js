@@ -13,8 +13,6 @@ async function request(path, body) {
   return await response.json().catch(() => ({}));
 }
 const authApi = {
-  // `exists` absent : refus du serveur (limite de tentatives atteinte, nonce…) ; `message` l'explique.
-  checkEmail: (email) => request("check-email", { email }),
   login: (email, password) => request("login", { email, password }),
   register: (email, password) => request("register", { email, password }),
   logout: () => request("logout"),

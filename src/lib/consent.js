@@ -6,7 +6,7 @@ function hasConsent(category) {
     return false;
   }
   if (!config.hasConsentApi) {
-    return true;
+    return category !== "statistics";
   }
   return typeof window.wp_has_consent === "function" && window.wp_has_consent(category) === true;
 }
