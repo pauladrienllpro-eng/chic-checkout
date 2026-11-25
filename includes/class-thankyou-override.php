@@ -107,23 +107,23 @@ class Thankyou_Override {
         $this->order = null;
         global $wp;
         $order_id = ( isset( $wp->query_vars['order-received'] ) ? absint( $wp->query_vars['order-received'] ) : 0 );
-        $order_key = ( isset( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : '' );
+        // La clé de commande est le jeton d'accès de cette URL (lien envoyé par WooCommerce
+        // et par la passerelle de paiement) : comparée à temps constant ci-dessous, elle ne
+        // déclenche aucune écriture. Lecture seule, comme WC_Shortcode_Checkout.
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $order_key = ( isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : '' );
         if ( $order_id > 0 ) {
             $candidate = wc_get_order( $order_id );
             if ( $candidate instanceof \WC_Order && hash_equals( $candidate->get_order_key(), $order_key ) ) {
                 $this->order = $candidate;
             }
         }
-        // Clé absente ou fausse : rien n'est touché (panier, commande en attente de
-        // paiement). Une visite forgée de cette URL ne peut pas vider la session d'un client.
         if ( !$this->order ) {
             return null;
         }
-        if ( WC()->session ) {
-            unset(WC()->session->order_awaiting_payment);
-        }
-        wc_empty_cart();
+        // Aucune écriture ici : le panier est vidé par WooCommerce lui-même
+        // (wc_clear_cart_after_payment, sur template_redirect), qui vérifie en plus que la
+        // commande correspond au panier de la session.
         $customer_id = $this->order->get_customer_id();
         if ( $customer_id && get_current_user_id() !== $customer_id ) {
             $this->login_redirect_url = $this->order->get_checkout_order_received_url();

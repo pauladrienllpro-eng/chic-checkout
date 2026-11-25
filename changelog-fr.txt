@@ -5,6 +5,15 @@ pour WordPress.org. Une ligne « * … » par amélioration, en langage marchand
 
 == Changelog ==
 
+= 1.14.1 =
+* Produits recommandés du panier : le nombre de produits affichés (3 à 5) se règle aussi dans la version gratuite.
+* Compatibilité : les exclusions pour les plugins d'optimisation (WP Rocket, SiteGround Optimizer) ne s'appliquent plus qu'au panier et au checkout ; le reste du site reste optimisé normalement.
+* Sécurité : contrôle renforcé sur les appels de connexion, de création de compte et des moyens de paiement ; la page de confirmation ne modifie plus le panier elle-même (WooCommerce s'en charge).
+
+= 1.14.0 =
+* Pro : réassurance création de compte. Sous « Créer un compte », montrez ce que le compte apporte (livraison offerte, points de fidélité, suivi de commande) : bannière avec icône et couleur de fond, liste d'avantages ou tuiles visuelles. Réglage dans Checkout → Identification.
+* Bannières (livraison, opération spéciale du panier) : italique et plusieurs liens dans le texte, en plus du gras.
+
 = 1.13.1 =
 * Relecture WordPress.org : plus aucune trace de la marque blanche dans la version gratuite.
 * Confidentialité : les événements Google Analytics 4 ne partent qu'aux visiteurs ayant accepté les statistiques via WP Consent API, et plus du tout sans elle. L'option « mesures navigateur sans bandeau de consentement » est retirée.

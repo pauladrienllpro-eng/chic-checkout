@@ -39,7 +39,8 @@ class Compat {
 		add_filter( 'script_loader_tag', array( $this, 'protect_script_tags' ), 20, 2 );
 		add_action( 'admin_notices', array( $this, 'maybe_notice_missing_build' ) );
 
-		// SiteGround Optimizer : exclusions par handle (combinaison, minification, async).
+		// SiteGround Optimizer : exclusions par handle (combinaison, minification, async),
+		// appliquées uniquement aux pages qui affichent l'app (voir add_our_handles()).
 		foreach ( array( 'sgo_javascript_combine_exclude', 'sgo_js_minify_exclude', 'sgo_js_async_exclude' ) as $filter ) {
 			add_filter( $filter, array( $this, 'add_our_handles' ) );
 		}
@@ -111,6 +112,12 @@ class Compat {
 	 * Raccourci : la requête courante affiche-t-elle une de nos apps React ?
 	 */
 	public static function rendering_app(): bool {
+		// Les balises conditionnelles (is_cart()…) ne répondent qu'une fois la requête
+		// principale résolue : avant, ou dans l'admin, aucune de nos apps n'est affichée.
+		if ( is_admin() || ! did_action( 'wp' ) ) {
+			return false;
+		}
+
 		$app = self::current_app();
 
 		return null !== $app && self::should_render( $app );
@@ -162,7 +169,9 @@ class Compat {
 	 * @return mixed
 	 */
 	public function add_our_handles( $handles ) {
-		if ( ! is_array( $handles ) ) {
+		// Seulement sur nos pages panier / checkout : ailleurs, les handles partagés
+		// (wp-i18n, react…) restent optimisés normalement.
+		if ( ! is_array( $handles ) || ! self::rendering_app() ) {
 			return $handles;
 		}
 
@@ -174,7 +183,7 @@ class Compat {
 	 * @return mixed
 	 */
 	public function add_our_patterns( $patterns ) {
-		if ( ! is_array( $patterns ) ) {
+		if ( ! is_array( $patterns ) || ! self::rendering_app() ) {
 			return $patterns;
 		}
 

@@ -2601,3 +2601,38 @@ body > .chic-processing-overlay {
     justify-content: center;
   }
 }
+
+/* Réassurance création de compte (version Pro, AccountPerks.tsx) : sous « Créer un
+   compte », même largeur maximale que les boutons de l'étape (400 px, centrés). */
+
+
+/* Icône prédéfinie ou image du marchand ramenée à 24 px, sans déformation. */
+
+/* Style 1 : bannière. Fond choisi par le marchand, texte noir ou blanc selon le fond. */
+
+
+
+
+/* Style 2 : liste d'avantages. */
+
+
+
+
+
+
+
+
+
+/* Style 3 : tuiles visuelles. Sans phrase d'accroche (is-compact), elles remontent sous
+   le bouton. Une ou deux tuiles gardent la taille d'une tuile sur trois, centrées. */
+
+
+
+
+
+
+
+/* Image carrée : réduite à la taille de la tuile, recadrée au centre si elle n'est pas carrée. */
+
+
+

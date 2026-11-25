@@ -4,7 +4,7 @@ Tags: woocommerce, checkout, cart, one page checkout, conversion
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.13.1
+Stable tag: 1.14.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -113,6 +113,15 @@ The plugin connects to an external service only when the matching feature is set
 * **Boxtal** and **La Poste**, on the Shipping step, when their plugins and the matching integration are active: pickup point map, loaded by the carrier's plugin.
 
 == Changelog ==
+
+= 1.14.1 =
+* Recommended products: the number of products shown (3 to 5) can now be set in the free version.
+* Compatibility: optimization plugin exclusions (WP Rocket, SiteGround Optimizer) now only apply to the cart and checkout pages; the rest of the site stays optimized.
+* Security: login, registration, logout and payment methods REST routes check the REST nonce in their permission callback; the order received page no longer changes the cart itself (WooCommerce does it).
+
+= 1.14.0 =
+* Pro: account creation reassurance. Under "Create an account", show what an account brings (free shipping, loyalty points, order tracking) as a banner, a list of benefits or image tiles.
+* Banners: text can now use italics and several links ([text](address)), in addition to bold.
 
 = 1.13.1 =
 * WordPress.org review: the free version no longer contains any white-label code.

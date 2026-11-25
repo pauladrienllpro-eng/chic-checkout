@@ -72,6 +72,11 @@ final class Pro_Upsell {
 					'title' => __( 'Connexion avec Google et Apple', 'chic-checkout' ),
 					'text'  => __( 'Le client s’identifie en un geste avec son compte Google ou Apple, sans mot de passe à retenir.', 'chic-checkout' ),
 				),
+				array(
+					'key'   => 'reassurance-compte',
+					'title' => __( 'Réassurance création de compte', 'chic-checkout' ),
+					'text'  => __( 'Sous « Créer un compte », montrez ce que le compte apporte (livraison offerte, points de fidélité, suivi de commande) en bannière, en liste ou en tuiles visuelles.', 'chic-checkout' ),
+				),
 			),
 			'checkout-shipping' => array(
 				array(

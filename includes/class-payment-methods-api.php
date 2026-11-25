@@ -29,7 +29,8 @@ class Payment_Methods_Api {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_payment_methods' ),
-				'permission_callback' => '__return_true',
+				// Nonce REST obligatoire (envoyé par payment-methods-api.ts).
+				'permission_callback' => array( Auth_Api::class, 'verify_nonce' ),
 			)
 		);
 	}
@@ -115,7 +116,7 @@ class Payment_Methods_Api {
 		}
 
 		$response = new \WP_REST_Response( $methods, 200 );
-		// `permission_callback` public (voir register_routes) + disponibilité qui dépend
+		// Route ouverte aux visiteurs anonymes (voir register_routes) + disponibilité qui dépend
 		// du client courant (myCred, COD selon adresse...) : un cache de page/CDN qui ne
 		// varie pas par cookie sert autrement la même réponse à tout le monde — constaté
 		// en prod, un moyen de paiement pourtant disponible pour un client précis

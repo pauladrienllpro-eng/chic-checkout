@@ -3,8 +3,8 @@
 /**
  * API REST du checkout pour la connexion : login, création de compte et déconnexion
  * (plus, en version Pro, la détection d'un compte existant). Accessible aux visiteurs anonymes (nécessaire pour un
- * checkout invité), protégée par le nonce REST standard plutôt que par un
- * permission_callback qui exigerait d'être déjà connecté.
+ * checkout invité) : le permission_callback exige le nonce REST standard, pas d'être
+ * déjà connecté.
  *
  * @package ChicCheckout
  */
@@ -24,7 +24,7 @@ class Auth_Api {
         register_rest_route( self::NAMESPACE_, '/login', array(
             'methods'             => 'POST',
             'callback'            => array($this, 'login'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => array(self::class, 'verify_nonce'),
             'args'                => array(
                 'email'    => array(
                     'required' => true,
@@ -37,7 +37,7 @@ class Auth_Api {
         register_rest_route( self::NAMESPACE_, '/register', array(
             'methods'             => 'POST',
             'callback'            => array($this, 'register'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => array(self::class, 'verify_nonce'),
             'args'                => array(
                 'email'    => array(
                     'required' => true,
@@ -50,15 +50,16 @@ class Auth_Api {
         register_rest_route( self::NAMESPACE_, '/logout', array(
             'methods'             => 'POST',
             'callback'            => array($this, 'logout'),
-            'permission_callback' => '__return_true',
+            'permission_callback' => array(self::class, 'verify_nonce'),
         ) );
     }
 
     /**
-     * Vérifie le nonce REST manuellement (les routes doivent rester accessibles aux
-     * visiteurs anonymes, donc pas de permission_callback classique).
+     * permission_callback des routes du checkout : nonce REST obligatoire. Les routes
+     * restent ouvertes aux visiteurs anonymes (connexion, création de compte, commande
+     * invité) : le nonce prouve que la requête vient de nos pages, pas d'un autre site.
      */
-    private function verify_nonce( \WP_REST_Request $request ) {
+    public static function verify_nonce( \WP_REST_Request $request ) {
         $nonce = $request->get_header( 'X-WP-Nonce' );
         if ( !$nonce || !wp_verify_nonce( $nonce, 'wp_rest' ) ) {
             return new \WP_Error('chic_invalid_nonce', __( 'Nonce invalide.', 'chic-checkout' ), array(
@@ -78,10 +79,6 @@ class Auth_Api {
     }
 
     public function login( \WP_REST_Request $request ) {
-        $nonce_check = $this->verify_nonce( $request );
-        if ( is_wp_error( $nonce_check ) ) {
-            return $nonce_check;
-        }
         $limited = Rate_Limiter::hit( 'login' );
         if ( is_wp_error( $limited ) ) {
             return $limited;
@@ -109,10 +106,6 @@ class Auth_Api {
     }
 
     public function register( \WP_REST_Request $request ) {
-        $nonce_check = $this->verify_nonce( $request );
-        if ( is_wp_error( $nonce_check ) ) {
-            return $nonce_check;
-        }
         if ( !self::registration_enabled() ) {
             return new \WP_REST_Response(array(
                 'success' => false,
@@ -158,10 +151,6 @@ class Auth_Api {
     }
 
     public function logout( \WP_REST_Request $request ) {
-        $nonce_check = $this->verify_nonce( $request );
-        if ( is_wp_error( $nonce_check ) ) {
-            return $nonce_check;
-        }
         wp_logout();
         return new \WP_REST_Response(array(
             'success' => true,

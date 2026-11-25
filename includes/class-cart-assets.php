@@ -16,9 +16,6 @@ if ( !defined( 'ABSPATH' ) ) {
 class Cart_Assets {
     const HANDLE = 'chic-checkout-cart-app';
 
-    /** Nombre de produits proposés par le carrousel de ventes additionnelles. */
-    const UPSELL_COUNT = 4;
-
     /** Mêmes handles que Assets::DEFAULT_STYLE_HANDLES/DEFAULT_SCRIPT_HANDLES, sans les
      * scripts propres au formulaire de checkout classique (absent de cette page). */
     const DEFAULT_STYLE_HANDLES = array(
@@ -234,7 +231,7 @@ class Cart_Assets {
             'cartUpsell'                  => array(
                 'enabled'  => $settings['cart_upsell_enabled'],
                 'title'    => Polylang_Strings::translate( $settings['cart_upsell_title'] ),
-                'maxCount' => self::UPSELL_COUNT,
+                'maxCount' => (int) $settings['cart_upsell_count'],
                 'products' => $this->resolve_upsell_pool( $settings, $initial_cart ),
             ),
             'cartExpirationMessage'       => ( Integrations::is_enabled( 'bookacti' ) && function_exists( 'bookacti_get_message' ) ? bookacti_get_message( 'cart_countdown' ) : '' ),
@@ -385,7 +382,7 @@ class Cart_Assets {
         // branches ci-dessous plutôt qu'appliqué en filtre après coup : même l'étiquette
         // forcée ne peut pas passer outre.
         $excluded_ids = array_values( array_unique( array_merge( $cart_product_ids, $hidden_product_ids ) ) );
-        $pool_limit = self::UPSELL_COUNT * 3;
+        $pool_limit = max( (int) $settings['cart_upsell_count'] * 3, 12 );
         $pool_ids = null;
         // Version gratuite : ventes croisées des articles du panier (onglet Produits liés de
         // la fiche produit), puis produits liés de WooCommerce (catégories / étiquettes).

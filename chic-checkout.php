@@ -4,7 +4,7 @@
  * Plugin Name:       Chic-checkout
  * Plugin URI:        https://pauladrien.fr/chic-checkout/
  * Description:       Remplace le panier, le checkout et la page de confirmation WooCommerce par un parcours en 3 étapes (Identification, Livraison, Paiement), basé sur la Store API.
- * Version:           1.13.1
+ * Version:           1.14.1
  * Requires at least: 6.6
  * Requires PHP:      8.2
  * Requires Plugins:  woocommerce
@@ -49,7 +49,7 @@ if ( defined( 'CHIC_CHECKOUT_VERSION' ) ) {
     } );
     return;
 }
-define( 'CHIC_CHECKOUT_VERSION', '1.13.1' );
+define( 'CHIC_CHECKOUT_VERSION', '1.14.1' );
 define( 'CHIC_CHECKOUT_FILE', __FILE__ );
 define( 'CHIC_CHECKOUT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CHIC_CHECKOUT_URL', plugin_dir_url( __FILE__ ) );

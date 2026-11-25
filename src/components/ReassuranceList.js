@@ -53,13 +53,32 @@ function GiftPresetIcon() {
     /* @__PURE__ */ jsx("path", { d: "M12 5c2.5 0 5-1.5 5-3s-2.5-1-3.5.5S12 5 12 5Z", stroke: "currentColor", strokeWidth: "1.5", strokeLinejoin: "round" })
   ] });
 }
+function LoyaltyPresetIcon() {
+  return /* @__PURE__ */ jsx("svg", { viewBox: "0 0 24 24", width: "26", height: "26", fill: "none", "aria-hidden": "true", children: /* @__PURE__ */ jsx(
+    "path",
+    {
+      d: "m12 3 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4l-5.2 2.7 1-5.8L3.5 9.2l5.9-.8z",
+      stroke: "currentColor",
+      strokeWidth: "1.5",
+      strokeLinejoin: "round"
+    }
+  ) });
+}
+function AccountPresetIcon() {
+  return /* @__PURE__ */ jsxs("svg", { viewBox: "0 0 24 24", width: "26", height: "26", fill: "none", "aria-hidden": "true", children: [
+    /* @__PURE__ */ jsx("path", { d: "M12 2.5 3.5 6.75v10.5L12 21.5l8.5-4.25V6.75z", stroke: "currentColor", strokeWidth: "1.5", strokeLinejoin: "round" }),
+    /* @__PURE__ */ jsx("path", { d: "M3.5 6.75 12 11l8.5-4.25M12 11v10.5", stroke: "currentColor", strokeWidth: "1.5", strokeLinejoin: "round" })
+  ] });
+}
 const PRESET_ICONS = {
   card: CardPresetIcon,
   shield: ShieldPresetIcon,
   delivery: DeliveryPresetIcon,
   return: ReturnPresetIcon,
   support: SupportPresetIcon,
-  gift: GiftPresetIcon
+  gift: GiftPresetIcon,
+  loyalty: LoyaltyPresetIcon,
+  account: AccountPresetIcon
 };
 function ReassuranceList({ items }) {
   if (items.length === 0) {
@@ -102,5 +121,6 @@ function ReassuranceList({ items }) {
   }) });
 }
 export {
+  PRESET_ICONS,
   ReassuranceList
 };

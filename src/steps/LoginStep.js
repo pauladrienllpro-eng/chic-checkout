@@ -44,7 +44,8 @@ function LoginStep({
   ctaLabels,
   onComplete
 }) {
-  const { homeUrl } = useConfig();
+  const config = useConfig();
+  const { homeUrl } = config;
   const [phase, setPhase] = useState("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -212,6 +213,7 @@ function LoginStep({
           /* @__PURE__ */ jsx("button", { type: "button", className: "chic-social-button", onClick: () => setPhase("password"), children: __("J'ai déjà un compte") })
         ] }),
         registrationEnabled && /* @__PURE__ */ jsx("button", { type: "button", className: "chic-social-button", onClick: () => setPhase("register"), children: __("Créer un compte") }),
+        false,
         false,
         guestCheckoutEnabled && /* @__PURE__ */ jsx(
           "button",

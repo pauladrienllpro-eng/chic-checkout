@@ -149,7 +149,8 @@ class Settings {
             'cta_login_email_label',
             'cta_login_password_label',
             'cta_login_guest_label',
-            'cta_login_register_label'
+            'cta_login_register_label',
+            'account_perks'
         ),
         'checkout-shipping' => array(
             'shipping_pickup_points_info',
@@ -252,12 +253,12 @@ class Settings {
         'text_overrides',
         'cart_blocks_desktop',
         'cart_blocks_mobile',
-        'cart_upsell_count',
         'cart_upsell_cheaper_enabled',
         'cart_upsell_related_enabled',
         'cart_upsell_forced_tag_ids',
         'cart_upsell_excluded_tag_ids',
-        'cart_upsell_excluded_category_ids'
+        'cart_upsell_excluded_category_ids',
+        'account_perks'
     );
 
     /** Anciens noms d'onglet (liens ?chic-tab=…) : page et sous-onglet actuels. */
@@ -298,6 +299,24 @@ class Settings {
     /** Nombre maximum de blocs configurables dans l'onglet Réassurance. */
     const REASSURANCE_ITEMS_MAX = 4;
 
+    /**
+     * Réassurance création de compte (version Pro) : bloc affiché sous « Créer un compte »
+     * à l'étape Identification. Trois styles : bannière, liste d'avantages, tuiles.
+     */
+    const ACCOUNT_PERKS_STYLES = array('banner', 'list', 'tiles');
+
+    const ACCOUNT_PERKS_LIST_MAX = 4;
+
+    const ACCOUNT_PERKS_TILES_MAX = 3;
+
+    /** Au-delà, la bannière dépasse trois lignes sur mobile. */
+    const ACCOUNT_PERKS_BANNER_TEXT_MAX = 240;
+
+    const ACCOUNT_PERKS_TILE_CAPTION_MAX = 30;
+
+    /** Gris clair neutre : lisible sur un fond de page blanc comme sur un fond de couleur. */
+    const ACCOUNT_PERKS_BG_DEFAULT = '#f5f5f4';
+
     /** Nombre maximum de produits sélectionnables (emballages / cadeaux du carrousel). */
     const CART_PRODUCTS_MAX = 6;
 
@@ -318,6 +337,8 @@ class Settings {
             'return'   => __( 'Retours', 'chic-checkout' ),
             'support'  => __( 'Service client', 'chic-checkout' ),
             'gift'     => __( 'Cadeau', 'chic-checkout' ),
+            'loyalty'  => __( 'Fidélité (étoile)', 'chic-checkout' ),
+            'account'  => __( 'Compte / suivi de commande', 'chic-checkout' ),
         );
     }
 
@@ -454,6 +475,7 @@ class Settings {
             'cart_promo_code_enabled'         => true,
             'cart_upsell_enabled'             => false,
             'cart_upsell_title'               => __( 'Vous aimerez aussi', 'chic-checkout' ),
+            'cart_upsell_count'               => 4,
             'seo_noindex'                     => true,
             'seo_nofollow'                    => true,
             'seo_meta_title'                  => '',
@@ -1084,6 +1106,7 @@ class Settings {
             'cart_promo_code_enabled'         => !empty( $value['cart_promo_code_enabled'] ),
             'cart_upsell_enabled'             => !empty( $value['cart_upsell_enabled'] ),
             'cart_upsell_title'               => ( sanitize_text_field( $value['cart_upsell_title'] ?? '' ) ?: __( 'Vous aimerez aussi', 'chic-checkout' ) ),
+            'cart_upsell_count'               => min( 5, max( 3, absint( $value['cart_upsell_count'] ?? 4 ) ) ),
             'seo_noindex'                     => !empty( $value['seo_noindex'] ),
             'seo_nofollow'                    => !empty( $value['seo_nofollow'] ),
             'seo_meta_title'                  => sanitize_text_field( $value['seo_meta_title'] ?? '' ),
@@ -2817,12 +2840,35 @@ class Settings {
 				/>
 			</label>
 		</p>
+		<p>
+			<label>
+				<?php 
+        esc_html_e( 'Nombre de produits affichés :', 'chic-checkout' );
+        ?>
+				<input
+					type="number"
+					min="3"
+					max="5"
+					step="1"
+					class="small-text"
+					name="<?php 
+        echo esc_attr( self::OPTION_KEY );
+        ?>[cart_upsell_count]"
+					value="<?php 
+        echo esc_attr( $settings['cart_upsell_count'] );
+        ?>"
+				/>
+			</label>
+			<p class="description"><?php 
+        esc_html_e( 'Entre 3 et 5 — au-delà, le carousel devient long à parcourir en défilement horizontal.', 'chic-checkout' );
+        ?></p>
+		</p>
 		<?php 
         if ( !Edition::has_pro_code() ) {
             ?>
 			<p class="description">
 				<?php 
-            esc_html_e( 'Produits proposés : les ventes croisées (onglet Produits liés de la fiche produit) des articles du panier, puis les produits liés de WooCommerce (même catégorie ou étiquette), 4 au maximum. Un produit déjà dans le panier n’est jamais reproposé.', 'chic-checkout' );
+            esc_html_e( 'Produits proposés : les ventes croisées (onglet Produits liés de la fiche produit) des articles du panier, puis les produits liés de WooCommerce (même catégorie ou étiquette). Un produit déjà dans le panier n’est jamais reproposé.', 'chic-checkout' );
             ?>
 			</p>
 			<?php 
